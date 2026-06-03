@@ -164,11 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Hiệu năng hô hấp của cá tăng vọt khi nồng độ Oxy hòa tan tụt giảm (cá đấu tranh ngớp khí)
-    if (currentOxygen < 40) {
-      respirationRate = 80;
-    } else {
-      respirationRate = 40;
-    }
+    // Thay đổi từ từ: Oxy 100% -> Hô hấp 40%, Oxy 0% -> Hô hấp 90%
+    respirationRate = Math.round(40 + (100 - currentOxygen) * 0.5);
 
     envDescIcon.textContent = icon;
     envDescTitle.textContent = title;
@@ -605,11 +602,13 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         showPhilosophicalPopup(clickedEntity, clickedFish);
+        e.stopPropagation();
         return; // Ngăn chặn thả thức ăn
       }
 
       const randomType = Math.random() > 0.3 ? 'heat' : 'cold';
-      foods.push(createFood(clickX, clickY, randomType));
+      const foodY = Math.max(clickY, height / 3);
+      foods.push(createFood(clickX, foodY, randomType));
     });
   }
 
@@ -881,6 +880,28 @@ document.addEventListener('DOMContentLoaded', () => {
         syncFishHighlightToActiveLaw();
       });
     }
+    
+    // Đóng bảng giải thích khi click ra ngoài
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#pond-popup') || 
+          e.target.closest('#category-explanation-box') || 
+          e.target.closest('.category-card') || 
+          e.target.closest('.weather-widget') ||
+          e.target.closest('.env-desc-widget') ||
+          e.target.closest('.philo-tabs') ||
+          e.target.closest('.quick-controls') ||
+          e.target.closest('.action-buttons')) {
+        return;
+      }
+      
+      if (activeCategory) {
+        activeCategory = null;
+        if (typeof pondPopup !== 'undefined' && pondPopup) pondPopup.classList.add('hidden');
+        if (typeof explanationBox !== 'undefined' && explanationBox) explanationBox.classList.add('hidden');
+        if (typeof categoryCards !== 'undefined' && categoryCards) categoryCards.forEach(c => c.classList.remove('active'));
+        syncFishHighlightToActiveLaw();
+      }
+    });
   }
 
   function syncFishHighlightToActiveLaw() {
@@ -990,10 +1011,10 @@ document.addEventListener('DOMContentLoaded', () => {
     aerator.width = 90;
     aerator.height = 90;
     
-    wastePile.x = width / 2 - 80;
-    wastePile.y = height - 25;
-    wastePile.width = 100;
-    wastePile.height = 25;
+    wastePile.x = width / 2 - 120;
+    wastePile.y = height - 40;
+    wastePile.width = 160;
+    wastePile.height = 40;
     
     netEnclosure.x = width - 180;
     netEnclosure.y = height - 180;
@@ -1173,11 +1194,12 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
         
       case 'tatnhien-ngauhien':
-        // Highlight boundary reflection (Tất nhiên)
+        // Highlight boundary reflection (Tất nhiên) - chỉ khoanh vùng nước (2/3 dưới)
         ctx.save();
         ctx.strokeStyle = 'rgba(255, 23, 68, 0.4)';
         ctx.lineWidth = 4;
-        ctx.strokeRect(0, 0, width, height);
+        const waterY = height / 3;
+        ctx.strokeRect(0, waterY, width, height - waterY);
         ctx.fillStyle = 'rgba(255, 23, 68, 0.85)';
         ctx.font = "bold 11.5px 'Outfit', sans-serif";
         ctx.textAlign = 'center';
@@ -1394,11 +1416,16 @@ document.addEventListener('DOMContentLoaded', () => {
       posY = wastePile.y - popHeight - 40; // Nằm hẳn lên trên đống rác
     } else if (entity === 'weather') {
       const weatherWidget = document.getElementById('weather-widget');
+      const envWidget = document.getElementById('env-desc-widget');
       if (weatherWidget) {
-        // Nằm bên phải của widget thời tiết
+        // Nằm bên phải của widget thời tiết và bảng sinh thái để không bị che
         const rect = weatherWidget.getBoundingClientRect();
         const containerRect = pondPopup.parentElement.getBoundingClientRect();
-        posX = (rect.right - containerRect.left) + 20;
+        let rightEdge = rect.right;
+        if (envWidget) {
+          rightEdge = Math.max(rightEdge, envWidget.getBoundingClientRect().right);
+        }
+        posX = (rightEdge - containerRect.left) + 20;
         posY = (rect.top - containerRect.top);
       } else {
         posX = 300;
@@ -1494,19 +1521,19 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.strokeStyle = 'rgba(76, 175, 80, 0.4)';
     ctx.lineWidth = 1.5;
     
-    const toxicScale = 0.4 + (fishes[0] ? fishes[0].toxicLevel / 100 : 0) * 1.0;
+    const toxicScale = 0.6 + (fishes[0] ? fishes[0].toxicLevel / 100 : 0) * 1.5;
     
     ctx.beginPath();
-    ctx.ellipse(wastePile.x + 30 * toxicScale, height - 10 * toxicScale, 25 * toxicScale, 12 * toxicScale, 0, 0, Math.PI * 2);
-    ctx.ellipse(wastePile.x + 70 * toxicScale, height - 7 * toxicScale, 32 * toxicScale, 10 * toxicScale, 0, 0, Math.PI * 2);
-    ctx.ellipse(wastePile.x + 50 * toxicScale, height - 13 * toxicScale, 38 * toxicScale, 14 * toxicScale, 0, 0, Math.PI * 2);
+    ctx.ellipse(wastePile.x + 48 * toxicScale, height - 16 * toxicScale, 40 * toxicScale, 19 * toxicScale, 0, 0, Math.PI * 2);
+    ctx.ellipse(wastePile.x + 112 * toxicScale, height - 11 * toxicScale, 51 * toxicScale, 16 * toxicScale, 0, 0, Math.PI * 2);
+    ctx.ellipse(wastePile.x + 80 * toxicScale, height - 21 * toxicScale, 61 * toxicScale, 22 * toxicScale, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
     
     if (Math.random() < 0.08) {
       tailParticles.push({
-        x: wastePile.x + (30 + Math.random() * 40) * toxicScale,
-        y: height - 15 * toxicScale,
+        x: wastePile.x + (40 + Math.random() * 60) * toxicScale,
+        y: height - 25 * toxicScale,
         vx: (Math.random() - 0.5) * 0.3,
         vy: -Math.random() * 0.5 - 0.2,
         radius: Math.random() * 2 + 1,
@@ -1548,10 +1575,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.strokeStyle = 'rgba(224, 64, 251, 0.4)';
     ctx.lineWidth = 1;
     const fishTime = timestamp * 0.001;
-    for (let f = 0; f < 2; f++) {
-      const fx = netEnclosure.x + 40 + Math.sin(fishTime + f * 3) * 25 + f * 30;
-      const fy = netEnclosure.y + 40 + Math.cos(fishTime * 0.8 + f) * 20 + f * 40;
-      const fAng = Math.cos(fishTime + f * 3);
+    for (let f = 0; f < 8; f++) {
+      const col = f % 3;
+      const row = Math.floor(f / 3);
+      const fx = netEnclosure.x + 40 + col * 45 + Math.sin(fishTime + f * 1.5) * 15;
+      const fy = netEnclosure.y + 50 + row * 40 + Math.cos(fishTime * 0.8 + f * 2) * 15;
+      const fAng = Math.cos(fishTime + f * 1.5);
       
       ctx.save();
       ctx.translate(fx, fy);
@@ -1779,7 +1808,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. Vẽ Mặt Trời hoặc Mặt Trăng (nếu thuộc thế giới quan Biện chứng hoặc Khoa học)
     if (currentTheme !== 'ocean') {
       ctx.save();
-      const sunMoonX = width / 4;
+      const sunMoonX = width * 3 / 4;
       const sunMoonY = height / 8;
       
       if (isDay) {
@@ -2120,7 +2149,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Smooth Oxygen Bar Update - Dynamically recomputed from day/night, weather and aerator status
     if (aeratorOn) {
       targetOxygen = 100;
-      currentOxygen += (targetOxygen - currentOxygen) * 0.08;
+      if (currentOxygen < targetOxygen) {
+        currentOxygen += 0.08; // Tăng dần dần theo tốc độ thực tế (khoảng 4.8% mỗi giây với 60 FPS)
+        if (currentOxygen > targetOxygen) currentOxygen = targetOxygen;
+      }
     } else {
       if (isDay && weatherState === 'sunny') {
         // Nắng ráo, ban ngày: tảo quang hợp mạnh, duy trì mức oxy tốt (80-100%)
@@ -2512,6 +2544,23 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Cập nhật vị trí uốn lượn tự nhiên, kiểm tra Oxy, nhiệt độ và các chú cá xung quanh để tránh nhau
       fish.update(width, height, currentOxygen, waterTemp, fishes);
+      
+      // Giới hạn không cho cá khác lọt vào vùng lưới quây cá lóc
+      if (fish.type !== 'snakehead' && fish.lifecycleStage === 'adult') {
+        const buffer = 45 * fish.scale;
+        if (fish.x > netEnclosure.x - buffer && fish.y > netEnclosure.y - buffer) {
+          const overlapX = fish.x - (netEnclosure.x - buffer);
+          const overlapY = fish.y - (netEnclosure.y - buffer);
+          if (overlapX < overlapY) {
+            fish.x = netEnclosure.x - buffer;
+            fish.vx = -Math.abs(fish.vx);
+            fish.wanderAngle = Math.PI - fish.wanderAngle;
+          } else {
+            fish.y = netEnclosure.y - buffer;
+            fish.vy = -Math.abs(fish.vy);
+          }
+        }
+      }
       
       // Xử lý khi cá ăn thức ăn
       if (fish.foodTarget && fish.foodTarget.eaten) {

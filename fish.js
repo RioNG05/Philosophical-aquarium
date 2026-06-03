@@ -301,20 +301,14 @@ class Fish {
 
     // Oxygen gasping: vượt tầng lên mặt nước thở
     if (currentOxygen !== undefined && currentOxygen < 40 && !this.isDead && this.lifecycleStage === 'adult') {
-      this.gaspCycleTimer--;
-      if (this.gaspCycleTimer <= 0) {
-        if (this.gaspPhase === 'gasping') {
-          this.gaspPhase = 'diving';
-          this.gaspCycleTimer = 240 + Math.random() * 60;
-        } else {
-          this.gaspPhase = 'gasping';
-          this.gaspCycleTimer = 180 + Math.random() * 60;
-        }
-      }
-      isGasping = this.gaspPhase === 'gasping';
-      isDiving = this.gaspPhase === 'diving';
+      this.gaspPhase = 'gasping';
+      isGasping = true;
+      isDiving = false;
     } else {
       this.gaspPhase = 'swimming';
+      if (!this.isDead && this.lifecycleStage === 'adult' && this.y < this.getLayerBounds(height).minY) {
+        isDiving = true;
+      }
     }
 
     // Miệng nhấp nháy
@@ -418,10 +412,13 @@ class Fish {
       else if (this.x > width - bufferX) { this.x = width - bufferX; this.vx = -Math.abs(this.vx); this.wanderAngle = Math.PI - this.wanderAngle; }
 
       // Giới hạn Y theo tầng – trừ khi đang ngớp khí
-      if (!isGasping) {
+      if (!isGasping && !isDiving) {
         const { minY, maxY } = this.getLayerBounds(height);
         if (this.y < minY) { this.y = minY; this.vy = Math.abs(this.vy) * 0.5; }
         else if (this.y > maxY) { this.y = maxY; this.vy = -Math.abs(this.vy) * 0.5; }
+      } else if (isDiving) {
+        const { maxY } = this.getLayerBounds(height);
+        if (this.y > maxY) { this.y = maxY; this.vy = -Math.abs(this.vy) * 0.5; }
       }
 
       this.wagTime += (currentSpeed * 0.08 + 0.02) * this.wagSpeedMultiplier * (isGasping ? 1.5 : 1.0);
