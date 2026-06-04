@@ -726,20 +726,65 @@ class Fish {
   }
 
   _updateDead(height) {
-    this.vx = 0; this.vy = 0; this.ax = 0; this.ay = 0;
-    const targetY = Fish.WATER_Y + 15;
-    if (this.y > targetY) this.y -= 0.6;
-    else if (this.y < targetY) this.y += 0.6;
-    if (this.deadRotation < Math.PI) this.deadRotation += 0.05;
+    // 1. Thả trôi lơ lửng: giảm tốc độ từ từ thay vì dừng hẳn
+    this.vx *= 0.98;
+    this.vy *= 0.98;
+    this.ax = 0;
+    this.ay = 0;
 
+    // 2. Dần dần nổi lên mặt nước
+    const targetY = Fish.WATER_Y + 15;
+    if (this.y > targetY + 2) {
+      this.vy -= 0.03; // Lực đẩy nổi lên nhẹ
+    } else if (this.y < targetY - 2) {
+      this.vy += 0.03;
+    } else {
+      this.vy *= 0.9;
+    }
+
+    // Giới hạn tốc độ nổi và trôi
+    let speed = Math.hypot(this.vx, this.vy);
+    if (speed > 1.2) {
+      this.vx = (this.vx / speed) * 1.2;
+      this.vy = (this.vy / speed) * 1.2;
+    }
+
+    this.x += this.vx;
+    this.y += this.vy;
+
+    // Lật bụng từ từ
+    if (this.deadRotation < Math.PI) {
+      this.deadRotation += 0.015;
+    }
+
+    // 3. Chết nằm ngang: góc đầu từ từ chuyển về 0 hoặc Math.PI
     let head = this.segments[0];
-    head.x = this.x; head.y = this.y; head.angle = 0;
+    head.x = this.x; 
+    head.y = this.y; 
+    
+    let targetHeadAngle = (Math.abs(head.angle) < Math.PI / 2) ? 0 : Math.PI;
+    let angleDiff = targetHeadAngle - head.angle;
+    while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+    while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+    head.angle += angleDiff * 0.02;
+
+    // Duỗi thẳng các đốt thân theo góc đầu
     for (let i = 1; i < this.numSegments; i++) {
       let seg = this.segments[i], prev = this.segments[i - 1];
       let dx = seg.x - prev.x, dy = seg.y - prev.y;
-      let angle = Math.atan2(dy, dx);
-      seg.x = prev.x + Math.cos(angle) * this.segmentSpacing;
-      seg.y = prev.y + Math.sin(angle) * this.segmentSpacing;
+      let currentAngle = Math.atan2(dy, dx);
+      
+      // Góc mục tiêu cho đốt này là ngược hướng với đầu
+      let targetBodyAngle = head.angle + Math.PI;
+      let diff = targetBodyAngle - currentAngle;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      
+      // Dần dần kéo đốt về hướng thẳng hàng
+      currentAngle += diff * 0.04;
+      
+      seg.x = prev.x + Math.cos(currentAngle) * this.segmentSpacing;
+      seg.y = prev.y + Math.sin(currentAngle) * this.segmentSpacing;
       seg.angle = Math.atan2(seg.y - prev.y, seg.x - prev.x);
     }
   }
