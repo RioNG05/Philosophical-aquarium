@@ -2510,8 +2510,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cập nhật vị trí của popup Triết học Cái riêng & Cái chung bám sát theo chú cá đang bơi
     if (!pondPopup.classList.contains('hidden') && activeCategory === 'rieng-chung' && activePopupFish) {
-      const popWidth = 300;
-      const popHeight = 150;
+      const popWidth = pondPopup.offsetWidth || 300;
+      const popHeight = pondPopup.offsetHeight || 150;
       let finalLeft = Math.max(10, Math.min(width - popWidth - 10, activePopupFish.x));
       let finalTop = Math.max(10, Math.min(height - popHeight - 10, activePopupFish.y));
       pondPopup.style.left = `${finalLeft}px`;

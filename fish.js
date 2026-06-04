@@ -1209,7 +1209,8 @@ class Fish {
     const dx = head.x - midSeg.x;
     const dy = head.y - midSeg.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const radius = Math.max(120 * this.scale, (dist + 60 * this.scale) * 1.6);
+    // Giảm kích thước vòng radar để ôm sát cá hơn, thẩm mỹ và không trồi lên mặt nước
+    const radius = Math.max(70 * this.scale, dist + 20 * this.scale);
 
     ctx.save();
     ctx.beginPath();

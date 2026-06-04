@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bể Cá Tương Tác Động - Virtual Aquarium</title>
+  <title>Ao Cá Tương Tác Động - Virtual Aquarium</title>
   <link rel="stylesheet" href="index.css">
-  <meta name="description" content="Trang web mô phỏng bể cá tương tác động 60FPS với hiệu ứng chuyển động uốn lượn tự nhiên và tương tác trực quan cho ăn, bơi theo chuột.">
+  <meta name="description"
+    content="Trang web mô phỏng ao cá tương tác động 60FPS với hiệu ứng chuyển động uốn lượn tự nhiên và tương tác trực quan cho ăn, bơi theo chuột.">
 </head>
+
 <body>
   <div class="app-container">
     <!-- LEFT: Bàn Điều Khiển Ao Cá (The Dashboard) -->
@@ -15,7 +18,7 @@
       <div id="canvas-container">
         <canvas id="aquarium-canvas"></canvas>
         <div id="red-flash-overlay" class="red-flash-overlay"></div>
-        
+
         <!-- Weather Widget (Tất nhiên & Ngẫu nhiên) -->
         <div class="weather-widget ui-element" id="weather-widget">
           <div class="weather-icon-wrapper">
@@ -41,7 +44,7 @@
         <!-- Pond Floating Pop-up -->
         <div class="pond-popup hidden" id="pond-popup">
           <button class="popup-close-btn" id="btn-close-popup">&times;</button>
-          <div class="popup-badge" id="popup-badge">CÁI RIÊNG & CÁI CHUNG</div>
+          <div class="popup-badge" id="popup-badge">CÁI CHUNG, CÁI RIÊNG & CÁI ĐƠN NHẤT</div>
           <h3 class="popup-title" id="popup-title">Giải thích Triết học</h3>
           <p class="popup-text" id="popup-text">Nội dung...</p>
         </div>
@@ -49,13 +52,14 @@
 
       <!-- Quick Control Bar (Floating Glassmorphism Dashboard with nested stats) -->
       <div class="quick-controls ui-element">
-        
+
         <!-- Nested Stats Group -->
         <div class="quick-control-group stats-group">
           <div class="stat-item">FPS: <span id="fps-counter" style="color: #fff; font-weight: bold;">60</span></div>
-          <div class="stat-item"><span id="active-quality-state" style="color: #00e5ff; font-weight: bold;">Nước Lỏng (25°C)</span></div>
+          <div class="stat-item"><span id="active-quality-state" style="color: #00e5ff; font-weight: bold;">Nước Lỏng
+              (25°C)</span></div>
         </div>
-        
+
         <div class="quick-control-group">
           <label class="switch-container">
             <span class="switch-label">Tia sáng (Caustics)</span>
@@ -80,7 +84,8 @@
       <header class="sidebar-header">
         <div class="sidebar-logo">
           <svg viewBox="0 0 24 24">
-            <path d="M12,2C11.5,2 10,4.5 10,7.5C10,9.5 10.7,11.2 11.8,12.3C9.1,13.6 6,14.5 2,13C4,15 7,16 10,15.5C10.5,17 11.5,18.2 12.8,18.9C13,20 14,22 15,22C14.8,20 14.5,19 13.8,18C16.8,16.5 19.5,15.5 22,17C21.5,14 19.5,11.5 16.5,10.2C16.8,9.4 17,8.5 17,7.5C17,4.5 15.5,2 15,2C14.5,2 13.5,4 13.5,6.5C13.5,7 13.6,7.5 13.7,8C13,8.5 12.2,9.3 11.7,10C10.9,9.2 10.5,8.2 10.5,7C10.5,5 11.5,3 12,2Z"/>
+            <path
+              d="M12,2C11.5,2 10,4.5 10,7.5C10,9.5 10.7,11.2 11.8,12.3C9.1,13.6 6,14.5 2,13C4,15 7,16 10,15.5C10.5,17 11.5,18.2 12.8,18.9C13,20 14,22 15,22C14.8,20 14.5,19 13.8,18C16.8,16.5 19.5,15.5 22,17C21.5,14 19.5,11.5 16.5,10.2C16.8,9.4 17,8.5 17,7.5C17,4.5 15.5,2 15,2C14.5,2 13.5,4 13.5,6.5C13.5,7 13.6,7.5 13.7,8C13,8.5 12.2,9.3 11.7,10C10.9,9.2 10.5,8.2 10.5,7C10.5,5 11.5,3 12,2Z" />
             <circle cx="14" cy="7.5" r="1" fill="#fff" />
           </svg>
           <div>
@@ -94,10 +99,13 @@
         <!-- PHÂN KHU 2: Khu Vực 3 Quy Luật -->
         <section class="philo-section" id="section-3-laws">
           <div class="section-title">
-            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path d="M12 3L1 9L12 15L21 10.09V17H23V9M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z"
+                fill="currentColor" />
+            </svg>
             <h2>3 Quy Luật Biện Chứng</h2>
           </div>
-          
+
           <div class="philo-tabs">
             <button class="philo-tab-btn active" data-tab="mauthuan">Mâu thuẫn</button>
             <button class="philo-tab-btn" data-tab="luongchat">Lượng - Chất</button>
@@ -108,9 +116,10 @@
             <!-- Tab 1: Mâu Thuẫn (Day/Night & Oxygen) -->
             <div class="tab-content active" id="tab-mauthuan">
               <div class="philo-desc">
-                <strong>Mâu thuẫn sinh học (Ngày / Đêm)</strong>: Quang hợp (sinh Oxy) và Hô hấp (tiêu thụ Oxy) là hai mặt đối lập vừa bài trừ, vừa nương tựa nhau tạo thế cân bằng thống nhất cho ao cá.
+                <strong>Mâu thuẫn sinh học (Ngày / Đêm)</strong>: Quang hợp (sinh Oxy) và Hô hấp (tiêu thụ Oxy) là hai
+                mặt đối lập vừa bài trừ, vừa nương tựa nhau tạo thế cân bằng thống nhất cho ao cá.
               </div>
-              
+
               <div class="control-group">
                 <div class="control-label">
                   <span>Chế độ ao cá</span>
@@ -136,9 +145,11 @@
             <!-- Tab 2: Lượng - Chất (Toxicity & Death/Leap) -->
             <div class="tab-content" id="tab-luongchat">
               <div class="philo-desc">
-                <strong>Tích tụ độc tố (Lượng - Chất)</strong>: Tích lũy về lượng rác thải/độc tố đạt tới Điểm nút (80%) sẽ phá vỡ thế cân bằng cũ thông qua Bước nhảy đột biến: nước hóa đen kịt, cá lật bụng chết (Chất mới xuất hiện). Kéo slider xuống để lọc nước hồi sinh cá.
+                <strong>Tích tụ độc tố (Lượng - Chất)</strong>: Tích lũy về lượng rác thải/độc tố đạt tới Điểm nút (80%)
+                sẽ phá vỡ thế cân bằng cũ thông qua Bước nhảy đột biến: nước hóa đen kịt, cá lật bụng chết (Chất mới
+                xuất hiện). Kéo slider xuống để lọc nước hồi sinh cá.
               </div>
-              
+
               <div class="control-group">
                 <div class="control-label">
                   <span>Hàm lượng khí độc</span>
@@ -150,14 +161,17 @@
               </div>
 
               <div class="action-buttons">
-                <button class="btn btn-primary" id="btn-overfeed" style="grid-column: span 2;">⚠ Cho cá ăn quá tải (+20% khí độc)</button>
+                <button class="btn btn-primary" id="btn-overfeed" style="grid-column: span 2;">⚠ Cho cá ăn quá tải (+20%
+                  khí độc)</button>
               </div>
             </div>
 
             <!-- Tab 3: Phủ Định (Negation of Negation & Life Cycle) -->
             <div class="tab-content" id="tab-phudinh">
               <div class="philo-desc">
-                <strong>Vòng xoáy tiến hóa (Phủ định của phủ định)</strong>: Trứng → Cá con (Phủ định 1) → Cá trưởng thành đẻ trứng và kết thúc vòng đời (Phủ định 2). Thế hệ F2, F3... kế thừa các gen ưu việt, phát triển lớn và khỏe hơn.
+                <strong>Vòng xoáy tiến hóa (Phủ định của phủ định)</strong>: Trứng → Cá con (Phủ định 1) → Cá trưởng
+                thành đẻ trứng và kết thúc vòng đời (Phủ định 2). Thế hệ F2, F3... kế thừa các gen ưu việt, phát triển
+                lớn và khỏe hơn.
               </div>
 
               <div class="control-group">
@@ -165,8 +179,11 @@
                   <span>Giai đoạn vòng đời</span>
                   <span class="val" id="lifecycle-stage-val">Trưởng thành (F1)</span>
                 </div>
-                <button class="btn btn-primary" id="btn-timeline-forward" style="width: 100%;">⏭ Tua nhanh thời gian (Phủ định)</button>
-                <button class="btn" id="btn-timeline-reset" style="width: 100%; margin-top: 8px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent;">🔄 Đặt lại từ đầu</button>
+                <button class="btn btn-primary" id="btn-timeline-forward" style="width: 100%;">⏭ Tua nhanh thời gian
+                  (Phủ định)</button>
+                <button class="btn" id="btn-timeline-reset"
+                  style="width: 100%; margin-top: 8px; border: 1px solid var(--border-color); color: var(--text-secondary); background: transparent;">🔄
+                  Đặt lại từ đầu</button>
               </div>
 
               <div class="control-group">
@@ -190,15 +207,20 @@
         <!-- PHÂN KHU 3: Khu Vực 6 Cặp Phạm Trù -->
         <section class="philo-section" id="section-6-categories">
           <div class="section-title">
-            <svg viewBox="0 0 24 24" width="18" height="18"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A1,1 0 0,0 11,7V13A1,1 0 0,0 12,14A1,1 0 0,0 13,13V7A1,1 0 0,0 12,6M12,16A1,1 0 0,0 11,17A1,1 0 0,0 12,18A1,1 0 0,0 13,17A1,1 0 0,0 12,16Z" fill="currentColor"/></svg>
+            <svg viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12,6A1,1 0 0,0 11,7V13A1,1 0 0,0 12,14A1,1 0 0,0 13,13V7A1,1 0 0,0 12,6M12,16A1,1 0 0,0 11,17A1,1 0 0,0 12,18A1,1 0 0,0 13,17A1,1 0 0,0 12,16Z"
+                fill="currentColor" />
+            </svg>
             <h2>6 Cặp Phạm Trù Biện Chứng</h2>
           </div>
-          <p class="section-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Nhấp vào thẻ hoặc các thực thể trong ao cá để xem giải thích chi tiết:</p>
-          
+          <p class="section-subtitle" style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem;">
+            Nhấp vào thẻ hoặc các thực thể trong ao cá để xem giải thích chi tiết:</p>
+
           <div class="categories-grid">
             <div class="category-card" data-category="rieng-chung">
               <div class="category-num">01</div>
-              <div class="category-name">Cái riêng & Cái chung</div>
+              <div class="category-name">Cái chung, Cái riêng & Cái đơn nhất</div>
             </div>
             <div class="category-card" data-category="nguyennhan-ketqua">
               <div class="category-num">02</div>
@@ -241,4 +263,5 @@
   <script src="fish.js"></script>
   <script src="aquarium.js"></script>
 </body>
+
 </html>
