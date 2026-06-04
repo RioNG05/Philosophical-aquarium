@@ -1,5 +1,5 @@
 // fish.js
-// Quản lý vật lý của từng chú cá, các trạng thái triết học và vẽ cá trên canvas.
+// Quản lý vật lý của từng chú cá, các trạng thái triết học và vẽ cá trên canvas
 // === PHIÊN BẢN 2.0: Hệ sinh thái 4 loài 15 con, phân 3 tầng nước rõ rệt ===
 
 class Fish {
@@ -25,33 +25,40 @@ class Fish {
 
     // Cấu hình hình dáng và màu sắc đặc trưng từng loài
     if (type === 'tilapia') {
-      // Cá Rô Phi: dẹt bên, sọc ngang đặc trưng – Tầng mặt
-      this.widths = [14, 21, 23, 21, 18, 14, 11, 9, 7, 4];
-      this.segmentSpacing = 15 * this.scale;
-      this.colors = { primary: '#546e7a', secondary: '#00838f', belly: '#eceff1', name: 'Cá Rô Phi' };
+      // Cá Rô Phi: thân dẹt, lưng nhô cao
+      this.widths = [14, 23, 26, 22, 17, 13, 10, 8, 6, 4];
+      this.segmentSpacing = 14 * this.scale;
+      this.colors = { primary: '#455a64', secondary: '#5e35b1', belly: '#eceff1', name: 'Cá Rô Phi' };
       this.swimSpeedMultiplier = 0.95;
-      this.depthZone = 'surface'; // Tầng mặt
+      this.depthZone = 'surface';
     } else if (type === 'grass_carp') {
-      // Cá Trắm Cỏ: thân thon dài, màu xanh rêu đặc trưng – Tầng giữa
-      this.widths = [14, 19, 21, 20, 18, 15, 12, 10, 7.5, 4.5];
+      // Cá Trắm Cỏ: thân thon dài, hình trụ thuôn đều
+      this.widths = [14, 18, 20, 19, 17, 14, 11, 9, 7, 4.5];
       this.segmentSpacing = 17 * this.scale;
-      this.colors = { primary: '#5d7a3e', secondary: '#33691e', belly: '#dcedc8', name: 'Cá Trắm Cỏ' };
+      this.colors = { primary: '#33691e', secondary: '#1b5e20', belly: '#dcedc8', name: 'Cá Trắm Cỏ' };
       this.swimSpeedMultiplier = 0.88;
-      this.depthZone = 'middle'; // Tầng giữa
+      this.depthZone = 'middle';
     } else if (type === 'snakehead') {
-      // Cá Lóc: thân tròn thon dài, da hoa văn chevron – Tầng giữa
+      // Cá Lóc: thân tròn thon dài như ống
       this.widths = [14, 16, 16, 15, 14, 13, 12, 11, 9, 7];
       this.segmentSpacing = 19 * this.scale;
-      this.colors = { primary: '#4e342e', secondary: '#1a0c00', belly: '#d7ccc8', name: 'Cá Lóc' };
+      this.colors = { primary: '#3e2723', secondary: '#1a0c00', belly: '#d7ccc8', name: 'Cá Lóc' };
       this.swimSpeedMultiplier = 1.15;
-      this.depthZone = 'middle'; // Tầng giữa
-    } else { // default 'carp' = Cá Chép
-      // Cá Chép: thân dày tròn, có râu, màu vàng đồng – Tầng đáy
-      this.widths = [16, 20, 19, 17, 15, 13, 11, 9.5, 7.5, 5];
+      this.depthZone = 'middle';
+    } else if (type === 'silver_carp') {
+      // Cá Mè: đầu cực to, thân thuôn dẹp, vảy nhuyễn mượt bạc
+      this.widths = [24, 25, 21, 17, 14, 11, 9, 7, 5, 3];
       this.segmentSpacing = 16 * this.scale;
-      this.colors = { primary: '#8d6e3f', secondary: '#5d4037', belly: '#fff8e1', name: 'Cá Chép' };
+      this.colors = { primary: '#546e7a', secondary: '#37474f', belly: '#ffffff', name: 'Cá Mè' };
+      this.swimSpeedMultiplier = 0.9;
+      this.depthZone = 'surface';
+    } else { 
+      // Cá Chép (carp): thân dày tròn, gù ở lưng, có râu
+      this.widths = [16, 22, 24, 20, 16, 13, 11, 9, 7, 5];
+      this.segmentSpacing = 15 * this.scale;
+      this.colors = { primary: '#d84315', secondary: '#f57f17', belly: '#fff8e1', name: 'Cá Chép' };
       this.swimSpeedMultiplier = 1.0;
-      this.depthZone = 'bottom'; // Tầng đáy
+      this.depthZone = 'bottom';
     }
 
     // Khởi tạo các đốt xương sống
@@ -483,7 +490,7 @@ class Fish {
             radius: Math.random() * 3 + 1.5,
             life: 1.0,
             decay: Math.random() * 0.018 + 0.01,
-            color: `rgba(${110 + Math.random()*40}, ${80 + Math.random()*30}, 40, `
+            color: `rgba(${110 + Math.random() * 40}, ${80 + Math.random() * 30}, 40, `
           });
         }
       }
@@ -913,66 +920,80 @@ class Fish {
       rightPoints.push({ x: seg.x - Math.cos(normalAngle) * r, y: seg.y - Math.sin(normalAngle) * r });
     }
 
-    ctx.beginPath();
-    const head = this.segments[0];
-    const snoutR = this.widths[0] * this.scale;
-    const snoutX = head.x + Math.cos(head.angle) * snoutR;
-    const snoutY = head.y + Math.sin(head.angle) * snoutR;
-    ctx.moveTo(snoutX, snoutY);
+    const buildBodyPath = () => {
+      ctx.beginPath();
+      const head = this.segments[0];
+      const snoutR = this.widths[0] * this.scale;
+      const snoutX = head.x + Math.cos(head.angle) * snoutR * 1.05;
+      const snoutY = head.y + Math.sin(head.angle) * snoutR * 1.05;
+      ctx.moveTo(snoutX, snoutY);
 
-    if (leftPoints.length > 1) {
-      let xc = (leftPoints[0].x + leftPoints[1].x) / 2, yc = (leftPoints[0].y + leftPoints[1].y) / 2;
-      ctx.quadraticCurveTo(leftPoints[0].x, leftPoints[0].y, xc, yc);
-      for (let i = 1; i < this.numSegments - 1; i++) {
-        let p1 = leftPoints[i], p2 = leftPoints[i + 1];
-        xc = (p1.x + p2.x) / 2; yc = (p1.y + p2.y) / 2;
-        ctx.quadraticCurveTo(p1.x, p1.y, xc, yc);
-      }
-      ctx.quadraticCurveTo(leftPoints[this.numSegments - 1].x, leftPoints[this.numSegments - 1].y, this.segments[this.numSegments - 1].x, this.segments[this.numSegments - 1].y);
-    } else { ctx.lineTo(leftPoints[0].x, leftPoints[0].y); }
+      if (leftPoints.length > 1) {
+        let xc = (leftPoints[0].x + leftPoints[1].x) / 2, yc = (leftPoints[0].y + leftPoints[1].y) / 2;
+        ctx.quadraticCurveTo(leftPoints[0].x, leftPoints[0].y, xc, yc);
+        for (let i = 1; i < this.numSegments - 1; i++) {
+          let p1 = leftPoints[i], p2 = leftPoints[i + 1];
+          xc = (p1.x + p2.x) / 2; yc = (p1.y + p2.y) / 2;
+          ctx.bezierCurveTo(p1.x, p1.y, xc, yc, xc, yc);
+        }
+        ctx.quadraticCurveTo(leftPoints[this.numSegments - 1].x, leftPoints[this.numSegments - 1].y, this.segments[this.numSegments - 1].x, this.segments[this.numSegments - 1].y);
+      } else { ctx.lineTo(leftPoints[0].x, leftPoints[0].y); }
 
-    const rightLen = rightPoints.length;
-    if (rightLen > 1) {
-      let xc = (rightPoints[rightLen - 1].x + rightPoints[rightLen - 2].x) / 2;
-      let yc = (rightPoints[rightLen - 1].y + rightPoints[rightLen - 2].y) / 2;
-      ctx.quadraticCurveTo(rightPoints[rightLen - 1].x, rightPoints[rightLen - 1].y, xc, yc);
-      for (let i = rightLen - 2; i > 0; i--) {
-        let p1 = rightPoints[i], p2 = rightPoints[i - 1];
-        xc = (p1.x + p2.x) / 2; yc = (p1.y + p2.y) / 2;
-        ctx.quadraticCurveTo(p1.x, p1.y, xc, yc);
-      }
-      ctx.quadraticCurveTo(rightPoints[0].x, rightPoints[0].y, snoutX, snoutY);
-    } else { ctx.lineTo(rightPoints[0].x, rightPoints[0].y); }
-    ctx.closePath();
+      const rightLen = rightPoints.length;
+      if (rightLen > 1) {
+        let xc = (rightPoints[rightLen - 1].x + rightPoints[rightLen - 2].x) / 2;
+        let yc = (rightPoints[rightLen - 1].y + rightPoints[rightLen - 2].y) / 2;
+        ctx.quadraticCurveTo(rightPoints[rightLen - 1].x, rightPoints[rightLen - 1].y, xc, yc);
+        for (let i = rightLen - 2; i > 0; i--) {
+          let p1 = rightPoints[i], p2 = rightPoints[i - 1];
+          xc = (p1.x + p2.x) / 2; yc = (p1.y + p2.y) / 2;
+          ctx.bezierCurveTo(p1.x, p1.y, xc, yc, xc, yc);
+        }
+        ctx.quadraticCurveTo(rightPoints[0].x, rightPoints[0].y, snoutX, snoutY);
+      } else { ctx.lineTo(rightPoints[0].x, rightPoints[0].y); }
+      ctx.closePath();
+    };
+
+    buildBodyPath();
 
     ctx.save();
     ctx.clip();
 
-    // Gradient thân cá
-    let bodyGrad = ctx.createLinearGradient(
-      this.segments[0].x, this.segments[0].y,
-      this.segments[this.numSegments - 1].x, this.segments[this.numSegments - 1].y
+    const midSeg = this.segments[Math.floor(this.numSegments / 2.5)];
+    const lightOffsetX = -Math.sin(midSeg.angle) * 12 * this.scale;
+    const lightOffsetY = Math.cos(midSeg.angle) * 12 * this.scale;
+
+    let bodyGrad = ctx.createRadialGradient(
+      midSeg.x + lightOffsetX, midSeg.y + lightOffsetY, 0,
+      midSeg.x, midSeg.y, 110 * this.scale
     );
+
     if (this.isDead) {
-      bodyGrad.addColorStop(0, '#cfd8dc');
-      bodyGrad.addColorStop(0.5, '#90a4ae');
+      bodyGrad.addColorStop(0, '#e0e0e0');
+      bodyGrad.addColorStop(0.4, '#b0bec5');
       bodyGrad.addColorStop(1, '#546e7a');
     } else {
-      bodyGrad.addColorStop(0, this.colors.primary);
-      bodyGrad.addColorStop(0.45, this.colors.secondary);
-      bodyGrad.addColorStop(1, this.colors.belly);
+      bodyGrad.addColorStop(0, '#ffffff');
+      bodyGrad.addColorStop(0.2, this.colors.belly);
+      bodyGrad.addColorStop(0.6, this.colors.primary);
+      bodyGrad.addColorStop(1, this.colors.secondary);
     }
 
     ctx.fillStyle = bodyGrad;
-    ctx.shadowBlur = 12 * this.scale;
-    ctx.shadowColor = this.isDead ? 'rgba(0,0,0,0.25)' : (state.secondary || 'rgba(0, 229, 255, 0.35)');
     ctx.fill();
 
-    // Hoa văn đặc trưng từng loài
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
+    ctx.lineWidth = 14 * this.scale;
+    ctx.shadowBlur = 12 * this.scale;
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.7)';
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
     if (!this.isDead) {
       if (this.type === 'tilapia') {
-        ctx.strokeStyle = 'rgba(38, 50, 56, 0.48)';
-        ctx.lineWidth = 4.2 * this.scale;
+        ctx.strokeStyle = 'rgba(38, 50, 56, 0.5)';
+        ctx.lineWidth = 4 * this.scale;
         ctx.lineCap = 'round';
         for (let k = 2; k < this.numSegments - 1; k += 1.3) {
           const seg = this.segments[Math.floor(k)];
@@ -1011,11 +1032,9 @@ class Fish {
           ctx.stroke();
         }
       } else if (this.type === 'grass_carp') {
-        // Cá Trắm Cỏ: sọc dọc nhạt màu nâu xanh
         ctx.strokeStyle = 'rgba(50, 80, 30, 0.45)';
         ctx.lineWidth = 3.0 * this.scale;
         ctx.lineCap = 'round';
-        // Vẽ vài sọc dọc theo thân
         for (let sLine = 0; sLine < 2; sLine++) {
           const offsetRatio = sLine === 0 ? 0.35 : -0.35;
           ctx.beginPath();
@@ -1029,49 +1048,37 @@ class Fish {
           }
           ctx.stroke();
         }
+      } else if (this.type === 'silver_carp') {
+        ctx.fillStyle = 'rgba(30, 40, 50, 0.4)';
+        for (let k = 1; k < this.numSegments - 2; k++) {
+          const seg = this.segments[k];
+          const r = this.widths[k] * this.scale;
+          const normalAngle = seg.angle + Math.PI / 2;
+          // Vẽ đốm (cá mè hoa)
+          const dotX1 = seg.x + Math.cos(normalAngle) * r * 0.4;
+          const dotY1 = seg.y + Math.sin(normalAngle) * r * 0.4;
+          ctx.beginPath(); ctx.arc(dotX1, dotY1, 1.5 * this.scale, 0, Math.PI*2); ctx.fill();
+          const dotX2 = seg.x - Math.cos(normalAngle) * r * 0.2;
+          const dotY2 = seg.y - Math.sin(normalAngle) * r * 0.2;
+          ctx.beginPath(); ctx.arc(dotX2, dotY2, 1.2 * this.scale, 0, Math.PI*2); ctx.fill();
+          if (k % 2 === 0) {
+            const dotX3 = seg.x + Math.cos(normalAngle) * r * 0.7;
+            const dotY3 = seg.y + Math.sin(normalAngle) * r * 0.7;
+            ctx.beginPath(); ctx.arc(dotX3, dotY3, 2.0 * this.scale, 0, Math.PI*2); ctx.fill();
+          }
+        }
       }
-      // Vảy cá
-      if (this.type !== 'snakehead') {
+
+      if (this.type !== 'snakehead' && this.type !== 'silver_carp') {
         this.drawProceduralScales(ctx);
       }
     }
 
-    // Countershading
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(this.segments[0].x, this.segments[0].y);
-    for (let i = 1; i < this.numSegments; i++) ctx.lineTo(this.segments[i].x, this.segments[i].y);
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.22)';
-    ctx.lineWidth = 14 * this.scale;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.stroke();
     ctx.restore();
 
-    // Highlight phản chiếu
-    ctx.save();
-    ctx.beginPath();
-    const sideOffsetAngle = head.angle - Math.PI / 2;
-    ctx.moveTo(head.x + Math.cos(sideOffsetAngle) * 3, head.y + Math.sin(sideOffsetAngle) * 3);
-    for (let i = 1; i < this.numSegments - 1; i++) {
-      const seg = this.segments[i];
-      const sAng = seg.angle - Math.PI / 2;
-      ctx.lineTo(seg.x + Math.cos(sAng) * (this.widths[i] * 0.25 * this.scale), seg.y + Math.sin(sAng) * (this.widths[i] * 0.25 * this.scale));
-    }
-    let shineGrad = ctx.createLinearGradient(this.segments[0].x, this.segments[0].y, this.segments[this.numSegments - 1].x, this.segments[this.numSegments - 1].y);
-    shineGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
-    shineGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.2)');
-    shineGrad.addColorStop(0.8, 'rgba(255, 255, 255, 0)');
-    ctx.strokeStyle = shineGrad;
-    ctx.lineWidth = 4 * this.scale;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.restore();
-
-    ctx.strokeStyle = this.isDead ? 'rgba(255,255,255,0.12)' : 'rgba(255, 255, 255, 0.22)';
-    ctx.lineWidth = 1.2 * this.scale;
+    buildBodyPath();
+    ctx.strokeStyle = this.isDead ? 'rgba(255,255,255,0.12)' : 'rgba(0, 0, 0, 0.25)';
+    ctx.lineWidth = 1.0 * this.scale;
     ctx.stroke();
     ctx.restore();
   }
@@ -1094,31 +1101,43 @@ class Fish {
   }
 
   drawProceduralScales(ctx) {
-    ctx.save();
-    if (this.type === 'carp') ctx.strokeStyle = 'rgba(121, 85, 72, 0.42)';
-    else if (this.type === 'tilapia') ctx.strokeStyle = 'rgba(38, 50, 56, 0.28)';
-    else if (this.type === 'grass_carp') ctx.strokeStyle = 'rgba(60, 100, 40, 0.32)';
-    else ctx.strokeStyle = 'rgba(255, 235, 59, 0.3)';
-    ctx.lineWidth = 0.9 * this.scale;
-    for (let i = 2; i <= 7; i++) {
-      const seg = this.segments[i];
-      const r = this.widths[i] * this.scale;
-      const normalAngle = seg.angle + Math.PI / 2;
-      const scaleRows = this.type === 'tilapia' ? 5 : 4;
-      for (let j = 0; j < scaleRows; j++) {
-        const t = (j / (scaleRows - 1)) * 1.7 - 0.85;
-        const px = seg.x + Math.cos(normalAngle) * r * t;
-        const py = seg.y + Math.sin(normalAngle) * r * t;
-        ctx.beginPath();
-        ctx.arc(px, py, r * 0.25, seg.angle - Math.PI / 2 - 0.1, seg.angle + Math.PI / 2 + 0.1);
-        ctx.stroke();
-      }
+    if (!Fish.scalePatternCanvas) {
+      Fish.scalePatternCanvas = document.createElement('canvas');
+      Fish.scalePatternCanvas.width = 16;
+      Fish.scalePatternCanvas.height = 16;
+      const pCtx = Fish.scalePatternCanvas.getContext('2d');
+      pCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+      pCtx.lineWidth = 1.2;
+      pCtx.beginPath();
+      pCtx.moveTo(8, 0); pCtx.lineTo(16, 8); pCtx.lineTo(8, 16); pCtx.lineTo(0, 8); pCtx.closePath();
+      pCtx.stroke();
+      Fish.scalePattern = pCtx.createPattern(Fish.scalePatternCanvas, 'repeat');
     }
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'source-atop';
+
+    const matrix = new DOMMatrix();
+    matrix.scaleSelf(this.scale * 0.7, this.scale * 0.7);
+    Fish.scalePattern.setTransform(matrix);
+
+    ctx.fillStyle = Fish.scalePattern;
+
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 180 * this.scale, 0, Math.PI * 2);
+    ctx.fill();
+
+    let tint = 'rgba(255,255,255,0.08)';
+    if (this.type === 'carp') tint = 'rgba(121, 85, 72, 0.15)';
+    else if (this.type === 'tilapia') tint = 'rgba(38, 50, 56, 0.15)';
+    else if (this.type === 'grass_carp') tint = 'rgba(60, 100, 40, 0.15)';
+
+    ctx.fillStyle = tint;
+    ctx.fill();
     ctx.restore();
   }
 
   draw(ctx, theme = 'ocean') {
-    // Vẽ hạt bùn / lá trước (nền)
     this.drawMudParticles(ctx);
     this.drawLeafParticles(ctx);
 
@@ -1128,11 +1147,33 @@ class Fish {
     const state = this.getWaterState();
     const isHighlighted = (theme === 'pond') && (this.highlightedPart !== null || this.isHovered);
 
+    if (!this.isDead) {
+      ctx.save();
+      ctx.translate(0, 35 * this.scale);
+      ctx.beginPath();
+      const leftPoints = [], rightPoints = [];
+      for (let i = 0; i < this.numSegments; i++) {
+        const seg = this.segments[i];
+        const r = this.widths[i] * this.scale * 0.75;
+        const normalAngle = seg.angle + Math.PI / 2;
+        leftPoints.push({ x: seg.x + Math.cos(normalAngle) * r, y: seg.y + Math.sin(normalAngle) * r });
+        rightPoints.push({ x: seg.x - Math.cos(normalAngle) * r, y: seg.y - Math.sin(normalAngle) * r });
+      }
+      ctx.moveTo(this.segments[0].x, this.segments[0].y);
+      for (let i = 0; i < leftPoints.length; i++) ctx.lineTo(leftPoints[i].x, leftPoints[i].y);
+      for (let i = rightPoints.length - 1; i >= 0; i--) ctx.lineTo(rightPoints[i].x, rightPoints[i].y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.fill();
+      ctx.restore();
+    }
+
     this.drawFins(ctx, state);
     this.drawSmoothBody(ctx, state);
 
-    // Râu cá chép
-    if (this.type === 'carp' || this.type === 'grass_carp') {
+    if (this.type === 'carp') {
       this.drawBarbels(ctx);
     }
 
@@ -1141,7 +1182,6 @@ class Fish {
     this.drawEyes(ctx);
     this.drawDorsalFin(ctx, state);
 
-    // Chỉ thị rình mồi cho Cá Lóc
     if (this.type === 'snakehead' && this.isStalking) {
       this._drawStalkIndicator(ctx);
     }
@@ -1163,20 +1203,37 @@ class Fish {
   }
 
   _drawStalkIndicator(ctx) {
+    const midSeg = this.segments[Math.floor(this.numSegments / 2)];
     const head = this.segments[0];
+
+    const dx = head.x - midSeg.x;
+    const dy = head.y - midSeg.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const radius = Math.max(120 * this.scale, (dist + 60 * this.scale) * 1.6);
+
     ctx.save();
     ctx.beginPath();
-    ctx.arc(head.x, head.y, 22 * this.scale, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(255, 80, 0, 0.35)';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([3, 4]);
+    ctx.arc(midSeg.x, midSeg.y, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(255, 60, 0, 0.4)';
+    ctx.lineWidth = 2.0 * this.scale;
+    ctx.setLineDash([8 * this.scale, 10 * this.scale]);
     ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(midSeg.x, midSeg.y, radius + 12 * this.scale, this.wagTime * 0.5, this.wagTime * 0.5 + Math.PI);
+    ctx.strokeStyle = 'rgba(255, 60, 0, 0.2)';
+    ctx.lineWidth = 4.0 * this.scale;
     ctx.setLineDash([]);
-    // con mắt nguy hiểm nhỏ
-    ctx.fillStyle = 'rgba(255, 80, 0, 0.6)';
-    ctx.font = `${8 * this.scale}px Outfit, sans-serif`;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(midSeg.x, midSeg.y, radius + 12 * this.scale, this.wagTime * 0.5 + Math.PI * 1.2, this.wagTime * 0.5 + Math.PI * 1.8);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 60, 0, 0.8)';
+    ctx.font = `italic ${12 * this.scale}px Outfit, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('👁', head.x, head.y - 22 * this.scale);
+    ctx.fillText('TARGET LOCK', midSeg.x, midSeg.y - radius - 18 * this.scale);
     ctx.restore();
   }
 
@@ -1187,17 +1244,32 @@ class Fish {
     ctx.translate(head.x, head.y);
     ctx.rotate(head.angle);
     if (this.deadRotation > 0) ctx.scale(1, Math.cos(this.deadRotation));
-    ctx.fillStyle = this.colors.secondary || '#ff5722';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+    
+    if (this.type === 'silver_carp') {
+      ctx.rotate(-0.2); // Miệng hếch ngược lên
+    }
+
+    let lipGrad = ctx.createLinearGradient(r, 0, r + 5 * this.scale, 0);
+    lipGrad.addColorStop(0, this.colors.secondary || '#ff5722');
+    lipGrad.addColorStop(1, 'rgba(255,255,255,0.5)');
+
+    ctx.fillStyle = lipGrad;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
     ctx.lineWidth = 1.0 * this.scale;
+
     const lipOpenOffset = this.mouthOpen * 5.5 * this.scale;
-    const lipR_W = 5.5 * this.scale;
-    const lipR_H = 3.5 * this.scale;
+    let lipR_W = 6.0 * this.scale;
+    let lipR_H = 3.8 * this.scale;
+    if (this.type === 'silver_carp') {
+      lipR_W = 8.5 * this.scale;
+      lipR_H = 5.0 * this.scale;
+    }
+
     ctx.beginPath();
-    ctx.ellipse(r - 1.5 * this.scale, -lipOpenOffset, lipR_W, lipR_H, 0.15, 0, Math.PI * 2);
+    ctx.ellipse(r - 1.0 * this.scale, -lipOpenOffset, lipR_W, lipR_H, 0.15, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     ctx.beginPath();
-    ctx.ellipse(r - 1.5 * this.scale, lipOpenOffset, lipR_W, lipR_H, -0.15, 0, Math.PI * 2);
+    ctx.ellipse(r - 1.0 * this.scale, lipOpenOffset, lipR_W, lipR_H, -0.15, 0, Math.PI * 2);
     ctx.fill(); ctx.stroke();
     ctx.restore();
   }
@@ -1276,53 +1348,75 @@ class Fish {
 
   drawFins(ctx, state) {
     ctx.save();
-    ctx.globalAlpha = 0.72;
     const seg1 = this.segments[1];
     const seg3 = this.segments[3];
     const seg7 = this.segments[7];
     const finLen = 25 * this.scale;
 
-    // Vây ngực
+    const hexToRgb = (hex) => {
+      let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16) : '255,255,255';
+    };
+
+    const getFinGradient = (x1, y1, x2, y2) => {
+      let grad = ctx.createLinearGradient(x1, y1, x2, y2);
+      grad.addColorStop(0, state.primary);
+      grad.addColorStop(0.5, `rgba(${hexToRgb(state.secondary)}, 0.6)`);
+      grad.addColorStop(1, `rgba(${hexToRgb(state.secondary)}, 0)`);
+      return grad;
+    };
+
     ctx.save();
     ctx.translate(seg1.x, seg1.y);
     ctx.rotate(seg1.angle);
     if (this.deadRotation > 0) ctx.scale(1, Math.cos(this.deadRotation));
     const turnAngle = this.segments[0].angle - this.segments[1].angle;
     const turnOffset = Math.max(-0.4, Math.min(0.4, turnAngle));
-    const leftAngle = Math.PI / 2 + Math.sin(this.wagTime) * 0.12 - turnOffset * 0.25;
-    const rightAngle = -Math.PI / 2 - Math.sin(this.wagTime) * 0.12 - turnOffset * 0.25;
-    // Left
+    const swimRhythm = Math.sin(this.wagTime - Math.PI / 4) * 0.25;
+    const leftAngle = Math.PI / 2 + swimRhythm - turnOffset * 0.25;
+    const rightAngle = -Math.PI / 2 - swimRhythm - turnOffset * 0.25;
+
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.bezierCurveTo(Math.cos(leftAngle - 0.2) * finLen, Math.sin(leftAngle - 0.2) * finLen, Math.cos(leftAngle + 0.3) * finLen, Math.sin(leftAngle + 0.3) * finLen, Math.cos(leftAngle + 0.5) * (finLen * 0.45), Math.sin(leftAngle + 0.5) * (finLen * 0.45));
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
-    ctx.strokeStyle = state.primary; ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 0.7 * this.scale;
-    for (let j = -2; j <= 2; j++) { ctx.beginPath(); ctx.moveTo(0, 0); const rAngle = leftAngle - j * 0.12; const rLen = finLen * (0.7 + Math.cos(j * 0.3) * 0.25); ctx.lineTo(Math.cos(rAngle) * rLen, Math.sin(rAngle) * rLen); ctx.stroke(); }
-    // Right
+    ctx.fillStyle = getFinGradient(0, 0, Math.cos(leftAngle) * finLen, Math.sin(leftAngle) * finLen);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.lineWidth = 0.6 * this.scale;
+    for (let j = -2; j <= 2; j++) {
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      const rAngle = leftAngle - j * 0.12;
+      const rLen = finLen * (0.8 + Math.cos(j * 0.3) * 0.2);
+      ctx.quadraticCurveTo(Math.cos(rAngle - 0.1) * rLen * 0.5, Math.sin(rAngle - 0.1) * rLen * 0.5, Math.cos(rAngle) * rLen, Math.sin(rAngle) * rLen);
+      ctx.stroke();
+    }
+
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.bezierCurveTo(Math.cos(rightAngle + 0.2) * finLen, Math.sin(rightAngle + 0.2) * finLen, Math.cos(rightAngle - 0.3) * finLen, Math.sin(rightAngle - 0.3) * finLen, Math.cos(rightAngle - 0.5) * (finLen * 0.45), Math.sin(rightAngle - 0.5) * (finLen * 0.45));
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
-    ctx.strokeStyle = state.primary; ctx.lineWidth = 1.5; ctx.fill(); ctx.stroke();
-    for (let j = -2; j <= 2; j++) { ctx.beginPath(); ctx.moveTo(0, 0); const rAngle = rightAngle - j * 0.12; const rLen = finLen * (0.7 + Math.cos(j * 0.3) * 0.25); ctx.lineTo(Math.cos(rAngle) * rLen, Math.sin(rAngle) * rLen); ctx.stroke(); }
+    ctx.fillStyle = getFinGradient(0, 0, Math.cos(rightAngle) * finLen, Math.sin(rightAngle) * finLen);
+    ctx.fill();
+    for (let j = -2; j <= 2; j++) {
+      ctx.beginPath(); ctx.moveTo(0, 0);
+      const rAngle = rightAngle - j * 0.12;
+      const rLen = finLen * (0.8 + Math.cos(j * 0.3) * 0.2);
+      ctx.quadraticCurveTo(Math.cos(rAngle + 0.1) * rLen * 0.5, Math.sin(rAngle + 0.1) * rLen * 0.5, Math.cos(rAngle) * rLen, Math.sin(rAngle) * rLen);
+      ctx.stroke();
+    }
     ctx.restore();
 
-    // Vây bụng
     ctx.save();
     ctx.translate(seg3.x, seg3.y);
     ctx.rotate(seg3.angle);
     if (this.deadRotation > 0) ctx.scale(1, Math.cos(this.deadRotation));
     const pelvicLen = finLen * 0.65;
-    const pLeftAngle = Math.PI / 2 + 0.15 + Math.sin(this.wagTime - 0.5) * 0.08;
-    const pRightAngle = -Math.PI / 2 - 0.15 - Math.sin(this.wagTime - 0.5) * 0.08;
+    const pLeftAngle = Math.PI / 2 + 0.15 + Math.sin(this.wagTime - 0.5) * 0.1;
+    const pRightAngle = -Math.PI / 2 - 0.15 - Math.sin(this.wagTime - 0.5) * 0.1;
     ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(Math.cos(pLeftAngle - 0.1) * pelvicLen, Math.sin(pLeftAngle - 0.1) * pelvicLen, Math.cos(pLeftAngle + 0.2) * pelvicLen, Math.sin(pLeftAngle + 0.2) * pelvicLen, Math.cos(pLeftAngle + 0.4) * (pelvicLen * 0.5), Math.sin(pLeftAngle + 0.4) * (pelvicLen * 0.5));
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'; ctx.strokeStyle = state.primary; ctx.lineWidth = 1.2; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = getFinGradient(0, 0, Math.cos(pLeftAngle) * pelvicLen, Math.sin(pLeftAngle) * pelvicLen); ctx.fill();
     ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(Math.cos(pRightAngle + 0.1) * pelvicLen, Math.sin(pRightAngle + 0.1) * pelvicLen, Math.cos(pRightAngle - 0.2) * pelvicLen, Math.sin(pRightAngle - 0.2) * pelvicLen, Math.cos(pRightAngle - 0.4) * (pelvicLen * 0.5), Math.sin(pRightAngle - 0.4) * (pelvicLen * 0.5));
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.18)'; ctx.strokeStyle = state.primary; ctx.lineWidth = 1.2; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = getFinGradient(0, 0, Math.cos(pRightAngle) * pelvicLen, Math.sin(pRightAngle) * pelvicLen); ctx.fill();
     ctx.restore();
 
-    // Vây hậu môn
     ctx.save();
     ctx.translate(seg7.x, seg7.y);
     ctx.rotate(seg7.angle);
@@ -1331,10 +1425,9 @@ class Fish {
     const analAngle = Math.PI - 0.35 + Math.sin(this.wagTime * 1.1) * 0.12;
     ctx.beginPath(); ctx.moveTo(0, 0);
     ctx.bezierCurveTo(Math.cos(analAngle - 0.2) * analLen, Math.sin(analAngle - 0.2) * analLen, Math.cos(analAngle + 0.2) * analLen, Math.sin(analAngle + 0.2) * analLen, 0, 0);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; ctx.strokeStyle = state.secondary; ctx.lineWidth = 1.2; ctx.fill(); ctx.stroke();
+    ctx.fillStyle = getFinGradient(0, 0, Math.cos(analAngle) * analLen, Math.sin(analAngle) * analLen); ctx.fill();
     ctx.restore();
 
-    // Vây đuôi
     const tailSeg = this.segments[this.numSegments - 1];
     ctx.save();
     ctx.translate(tailSeg.x, tailSeg.y);
@@ -1347,12 +1440,13 @@ class Fish {
     ctx.moveTo(0, 0);
     if (this.type === 'tilapia') {
       ctx.bezierCurveTo(Math.cos(tailAngle - 0.7) * tailLen, Math.sin(tailAngle - 0.7) * tailLen, Math.cos(tailAngle) * (tailLen * 1.3), Math.sin(tailAngle) * (tailLen * 1.3), Math.cos(tailAngle + 0.7) * tailLen, Math.sin(tailAngle + 0.7) * tailLen);
-      ctx.closePath();
     } else if (this.type === 'snakehead') {
       ctx.bezierCurveTo(Math.cos(tailAngle - 0.55) * tailLen, Math.sin(tailAngle - 0.55) * tailLen, Math.cos(tailAngle) * (tailLen * 1.25), Math.sin(tailAngle) * (tailLen * 1.25), Math.cos(tailAngle + 0.55) * tailLen, Math.sin(tailAngle + 0.55) * tailLen);
-      ctx.closePath();
+    } else if (this.type === 'silver_carp') {
+      const tl = tailLen * 1.3;
+      ctx.bezierCurveTo(Math.cos(tailAngle - 0.7) * tl, Math.sin(tailAngle - 0.7) * tl, Math.cos(tailAngle - 0.1) * (tl * 1.2), Math.sin(tailAngle - 0.1) * (tl * 1.2), Math.cos(tailAngle) * (tl * 0.35), Math.sin(tailAngle) * (tl * 0.35));
+      ctx.bezierCurveTo(Math.cos(tailAngle + 0.1) * (tl * 1.2), Math.sin(tailAngle + 0.1) * (tl * 1.2), Math.cos(tailAngle + 0.7) * tl, Math.sin(tailAngle + 0.7) * tl, 0, 0);
     } else if (this.type === 'grass_carp') {
-      // Cá Trắm: đuôi xẻ thùy nhẹ, hơi dài hơn
       const tl = tailLen * 1.12;
       ctx.bezierCurveTo(Math.cos(tailAngle - 0.5) * tl, Math.sin(tailAngle - 0.5) * tl, Math.cos(tailAngle - 0.1) * (tl * 1.25), Math.sin(tailAngle - 0.1) * (tl * 1.25), Math.cos(tailAngle) * (tl * 0.82), Math.sin(tailAngle) * (tl * 0.82));
       ctx.bezierCurveTo(Math.cos(tailAngle + 0.1) * (tl * 1.25), Math.sin(tailAngle + 0.1) * (tl * 1.25), Math.cos(tailAngle + 0.5) * tl, Math.sin(tailAngle + 0.5) * tl, 0, 0);
@@ -1362,11 +1456,10 @@ class Fish {
     }
 
     let finGrad = ctx.createLinearGradient(0, 0, Math.cos(tailAngle) * tailLen, Math.sin(tailAngle) * tailLen);
-    finGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
-    finGrad.addColorStop(0.4, state.secondary);
-    finGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    finGrad.addColorStop(0, state.primary);
+    finGrad.addColorStop(0.3, state.secondary);
+    finGrad.addColorStop(1, `rgba(${hexToRgb(state.secondary)}, 0)`);
     ctx.fillStyle = finGrad; ctx.fill();
-    ctx.strokeStyle = state.secondary; ctx.lineWidth = 1.8; ctx.stroke();
 
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.lineWidth = 0.8 * this.scale;
@@ -1376,7 +1469,7 @@ class Fish {
       ctx.beginPath(); ctx.moveTo(0, 0);
       const rAngle = tailAngle + j * spread;
       const rLen = tailLen * (this.type === 'tilapia' ? 0.92 : 0.8 - Math.abs(j) * 0.05);
-      ctx.lineTo(Math.cos(rAngle) * rLen, Math.sin(rAngle) * rLen);
+      ctx.quadraticCurveTo(Math.cos(rAngle + 0.1) * rLen * 0.5, Math.sin(rAngle + 0.1) * rLen * 0.5, Math.cos(rAngle) * rLen, Math.sin(rAngle) * rLen);
       ctx.stroke();
     }
     ctx.restore();
@@ -1385,7 +1478,12 @@ class Fish {
 
   drawDorsalFin(ctx, state) {
     ctx.save();
-    ctx.globalAlpha = 0.75;
+
+    const hexToRgb = (hex) => {
+      let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? parseInt(result[1], 16) + ',' + parseInt(result[2], 16) + ',' + parseInt(result[3], 16) : '255,255,255';
+    };
+
     ctx.beginPath();
     let segStart = this.segments[2];
     ctx.moveTo(segStart.x, segStart.y);
@@ -1393,24 +1491,27 @@ class Fish {
     for (let i = 7; i >= 2; i--) {
       let seg = this.segments[i];
       let r = this.widths[i] * this.scale;
-      let finW = r * 0.28;
-      let sway = Math.sin(this.wagTime - i * 0.3) * 0.15;
+      let finW = r * 0.35;
+      let sway = Math.sin(this.wagTime - i * 0.3) * 0.18;
       let angle = seg.angle + Math.PI / 2 + sway;
       ctx.lineTo(seg.x + Math.cos(angle) * finW, seg.y + Math.sin(angle) * finW);
     }
     ctx.closePath();
+
     let grad = ctx.createLinearGradient(this.segments[2].x, this.segments[2].y, this.segments[7].x, this.segments[7].y);
-    grad.addColorStop(0, state.secondary);
-    grad.addColorStop(0.5, this.colors.primary);
-    grad.addColorStop(1, 'rgba(0,0,0,0.15)');
+    grad.addColorStop(0, state.primary);
+    grad.addColorStop(0.5, `rgba(${hexToRgb(state.secondary)}, 0.7)`);
+    grad.addColorStop(1, `rgba(${hexToRgb(state.secondary)}, 0)`);
     ctx.fillStyle = grad; ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)'; ctx.lineWidth = 1 * this.scale; ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 0.8 * this.scale;
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 0.8 * this.scale;
     for (let i = 2; i <= 7; i++) {
       let seg = this.segments[i]; let r = this.widths[i] * this.scale;
-      let finW = r * 0.28; let sway = Math.sin(this.wagTime - i * 0.3) * 0.15;
+      let finW = r * 0.35; let sway = Math.sin(this.wagTime - i * 0.3) * 0.18;
       let angle = seg.angle + Math.PI / 2 + sway;
-      ctx.beginPath(); ctx.moveTo(seg.x, seg.y); ctx.lineTo(seg.x + Math.cos(angle) * finW, seg.y + Math.sin(angle) * finW); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(seg.x, seg.y);
+      ctx.quadraticCurveTo(seg.x + Math.cos(angle - 0.1) * finW * 0.5, seg.y + Math.sin(angle - 0.1) * finW * 0.5, seg.x + Math.cos(angle) * finW, seg.y + Math.sin(angle) * finW);
+      ctx.stroke();
     }
     ctx.restore();
   }
@@ -1461,15 +1562,30 @@ class Fish {
   drawEyes(ctx) {
     const head = this.segments[0];
     const headRadius = this.widths[0] * this.scale;
-    const eyeRadius = 3.5 * this.scale;
-    const pupilRadius = 1.5 * this.scale;
+    let eyeRadius = 4.0 * this.scale;
+    let pupilRadius = 1.8 * this.scale;
     ctx.save();
     ctx.translate(head.x, head.y);
     ctx.rotate(head.angle);
     if (this.deadRotation > 0) ctx.scale(1, Math.cos(this.deadRotation));
-    const eyeX = Math.cos(0.65) * (headRadius * 0.75);
-    const eyeY_L = Math.sin(0.65) * (headRadius * 0.75);
-    const eyeY_R = -Math.sin(0.65) * (headRadius * 0.75);
+    
+    let eyeX = Math.cos(0.65) * (headRadius * 0.75);
+    let eyeY_L = Math.sin(0.65) * (headRadius * 0.75);
+    let eyeY_R = -Math.sin(0.65) * (headRadius * 0.75);
+
+    if (this.type === 'snakehead') {
+      eyeRadius = 3.0 * this.scale;
+      pupilRadius = 1.2 * this.scale;
+      eyeX = Math.cos(0.35) * (headRadius * 0.65);
+      eyeY_L = Math.sin(0.35) * (headRadius * 0.65);
+      eyeY_R = -Math.sin(0.35) * (headRadius * 0.65);
+    } else if (this.type === 'silver_carp') {
+      eyeRadius = 3.2 * this.scale;
+      pupilRadius = 1.4 * this.scale;
+      eyeX = Math.cos(1.0) * (headRadius * 0.85);
+      eyeY_L = Math.sin(1.0) * (headRadius * 0.85);
+      eyeY_R = -Math.sin(1.0) * (headRadius * 0.85);
+    }
 
     if (this.isDead) {
       ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
@@ -1477,20 +1593,29 @@ class Fish {
       ctx.beginPath(); ctx.moveTo(eyeX - 2, eyeY_R - 2); ctx.lineTo(eyeX + 2, eyeY_R + 2); ctx.moveTo(eyeX + 2, eyeY_R - 2); ctx.lineTo(eyeX - 2, eyeY_R + 2); ctx.stroke();
     } else {
       let irisColor = '#cfd8dc';
-      if (this.type === 'carp') irisColor = '#ffd54f';
-      else if (this.type === 'tilapia') irisColor = '#b0bec5';
-      else if (this.type === 'grass_carp') irisColor = '#a5d6a7';
-      else if (this.type === 'snakehead') irisColor = '#ff8a65'; // Mắt vàng cam nguy hiểm
+      if (this.type === 'carp') irisColor = '#ffb300';
+      else if (this.type === 'tilapia') irisColor = '#90a4ae';
+      else if (this.type === 'grass_carp') irisColor = '#81c784';
+      else if (this.type === 'snakehead') irisColor = '#ff5722';
       const lookOffset = 0.5 * this.scale;
 
       [eyeY_L, eyeY_R].forEach(eyeY => {
-        ctx.fillStyle = irisColor;
+        let irisGrad = ctx.createRadialGradient(eyeX, eyeY, pupilRadius, eyeX, eyeY, eyeRadius);
+        irisGrad.addColorStop(0, '#ffffff');
+        irisGrad.addColorStop(0.3, irisColor);
+        irisGrad.addColorStop(1, '#333333');
+
+        ctx.fillStyle = irisGrad;
         ctx.beginPath(); ctx.arc(eyeX, eyeY, eyeRadius, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 0.5; ctx.stroke();
-        ctx.fillStyle = '#000000';
+        ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = 0.8; ctx.stroke();
+
+        ctx.fillStyle = '#0a0a0a';
         ctx.beginPath(); ctx.arc(eyeX + lookOffset, eyeY, pupilRadius, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(eyeX + lookOffset - 0.7 * this.scale, eyeY - 0.7 * this.scale, 0.7 * this.scale, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.beginPath(); ctx.arc(eyeX + lookOffset - 1.0 * this.scale, eyeY - 1.0 * this.scale, 0.8 * this.scale, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.beginPath(); ctx.arc(eyeX + lookOffset + 1.2 * this.scale, eyeY + 1.2 * this.scale, 0.4 * this.scale, 0, Math.PI * 2); ctx.fill();
       });
     }
     ctx.restore();

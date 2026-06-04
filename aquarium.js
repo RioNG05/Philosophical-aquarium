@@ -5,30 +5,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const canvas = document.getElementById('aquarium-canvas');
   const ctx = canvas.getContext('2d');
   const container = document.getElementById('canvas-container');
-  
+
   // UI Elements
   const themeButtons = document.querySelectorAll('.theme-btn');
   const tabButtons = document.querySelectorAll('.philo-tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
-  
+
   // New UI Elements for 3 Laws
   const btnModeDay = document.getElementById('btn-mode-day');
   const btnModeNight = document.getElementById('btn-mode-night');
   const timeModeVal = document.getElementById('time-mode-val');
   const oxygenVal = document.getElementById('oxygen-val');
   const oxygenProgress = document.getElementById('oxygen-progress');
-  
+
   const toxicSlider = document.getElementById('toxic-slider');
   const toxicVal = document.getElementById('toxic-val');
   const btnOverfeed = document.getElementById('btn-overfeed');
-  
+
   const lifecycleStageVal = document.getElementById('lifecycle-stage-val');
   const btnTimelineForward = document.getElementById('btn-timeline-forward');
   const generationChart = document.getElementById('generation-chart');
-  
+
   const toggleRays = document.getElementById('toggle-rays');
   const toggleBubbles = document.getElementById('toggle-bubbles');
-  
+
   const activeQualityState = document.getElementById('active-quality-state');
   const fpsCounter = document.getElementById('fps-counter');
 
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Trạng thái mô phỏng ao cá
   let width = canvas.width = container.clientWidth;
   let height = canvas.height = container.clientHeight;
-  
+
   let fishes = [];
   let foods = [];
   let bubbles = [];
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let fps = 60;
   let frameCount = 0;
   let fpsTimer = 0;
-  
+
   let activeCategory = null; // Cặp phạm trù đang kích hoạt: 'rieng-chung', 'nguyennhan-ketqua',...
 
   // Thuộc tính mô phỏng cho 3 Quy luật Triết học
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let rainDrops = [];
   let seedlingParticles = [];
   let hoveredObject = null; // Thực thể đang rê chuột qua: 'fish', 'aerator', 'waste', 'net', 'bucket'
-  
+
   // Theo dõi vị trí của chuột
   const mouse = {
     x: 0,
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cập nhật mô tả và bảng chỉ số mô phỏng sinh thái động (Góc trên bên phải)
   function updateEnvDescription() {
     if (!envDescWidget || !envDescIcon || !envDescTitle || !envDescBody) return;
-    
+
     let icon = "☀";
     let title = "";
 
@@ -241,16 +241,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Khởi tạo các phần tử mô phỏng
   function init() {
     resizeCanvas();
-    
-    // Khởi tạo 5 con cá thuộc 5 loài khác nhau (koi, carp, goldfish, tilapia, snakehead)
+
+    // Khởi tạo 5 con cá thuộc 5 loài khác nhau (carp, snakehead, tilapia, grass_carp, silver_carp)
     fishes = [];
-    const types = ['koi', 'carp', 'goldfish', 'tilapia', 'snakehead'];
+    const types = ['carp', 'snakehead', 'tilapia', 'grass_carp', 'silver_carp'];
     types.forEach((type, idx) => {
       const fx = (idx + 0.5) * (width / 5) + (Math.random() - 0.5) * 30;
-      const fy = (height / 3 + 45) + Math.random() * (height * 2/3 - 100);
+      const fy = (height / 3 + 45) + Math.random() * (height * 2 / 3 - 100);
       const scale = type === 'goldfish' ? 1.2 : 1.4;
       const fish = new Fish(fx, fy, type, scale);
-      
+
       // Con cá koi đầu tiên làm nổi bật bộ phận theo Quy luật Triết học
       if (idx === 0) {
         fish.highlightedPart = 'head';
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       fishes.push(fish);
     });
-    
+
     // Khởi tạo bong bóng nước ban đầu
     for (let i = 0; i < 30; i++) {
       bubbles.push(createBubble(true));
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         opacity: Math.random() * 0.15 + 0.05
       });
     }
-    
+
     // Đăng ký các hàm lắng nghe sự kiện
     window.addEventListener('resize', resizeCanvas);
     setupMouseInteraction();
@@ -344,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPhilosophyLeapListener();
     setupEvolutionListener();
     updateEnvDescription();
-    
+
     // Bắt đầu vòng lặp hoạt ảnh chính
     requestAnimationFrame(loop);
   }
@@ -365,22 +365,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateAndDrawBubbles() {
     if (!toggleBubbles.checked) return;
-    
+
     ctx.save();
     ctx.strokeStyle = currentTheme === 'cyber' ? 'rgba(213, 0, 249, 0.3)' : 'rgba(255, 255, 255, 0.25)';
     ctx.fillStyle = currentTheme === 'cyber' ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)';
     ctx.lineWidth = 1;
-    
+
     bubbles.forEach((bubble, idx) => {
       bubble.y -= bubble.speed;
       bubble.wiggle += bubble.wiggleSpeed;
       bubble.x += Math.sin(bubble.wiggle) * bubble.wiggleRange;
-      
+
       ctx.beginPath();
       ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
       ctx.stroke();
       ctx.fill();
-      
+
       // Bubbles pop when they reach the water surface (height / 3)
       if (bubble.y < height / 3 || bubble.x < -20 || bubble.x > width + 20) {
         bubbles[idx] = createBubble(false);
@@ -409,10 +409,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateAndDrawFood() {
     ctx.save();
-    
+
     foods.forEach((pellet, idx) => {
       if (pellet.eaten) return;
-      
+
       if (pellet.y < height - 10) {
         pellet.y += pellet.vy;
         pellet.wiggleTime += 0.05;
@@ -420,20 +420,20 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         pellet.dissolveTimer--;
       }
-      
+
       ctx.shadowBlur = 6;
       ctx.shadowColor = pellet.glowColor;
       ctx.fillStyle = pellet.color;
       ctx.beginPath();
       ctx.arc(pellet.x, pellet.y, pellet.radius, 0, Math.PI * 2);
       ctx.fill();
-      
+
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(pellet.x - 1, pellet.y - 1, pellet.radius * 0.35, 0, Math.PI * 2);
       ctx.fill();
     });
-    
+
     foods = foods.filter(p => !p.eaten && p.dissolveTimer > 0);
     ctx.restore();
   }
@@ -442,19 +442,19 @@ document.addEventListener('DOMContentLoaded', () => {
   let raysOffset = 0;
   function drawSunRays() {
     if (!toggleRays.checked) return;
-    
+
     ctx.save();
     ctx.globalCompositeOperation = 'screen';
-    
+
     raysOffset += 0.002;
     const rayCount = 5;
     const rayWidth = width / 3.5;
-    
+
     for (let i = 0; i < rayCount; i++) {
       const angle = -0.12 + Math.sin(raysOffset + i * 1.8) * 0.06;
       const xTop = (i * (width / (rayCount - 1))) + Math.cos(raysOffset * 1.5 + i) * 50;
       const gradient = ctx.createLinearGradient(xTop, 0, xTop + Math.sin(angle) * height, height);
-      
+
       if (currentTheme === 'cyber') {
         gradient.addColorStop(0, 'rgba(213, 0, 249, 0.15)');
         gradient.addColorStop(0.5, 'rgba(0, 229, 255, 0.04)');
@@ -468,21 +468,21 @@ document.addEventListener('DOMContentLoaded', () => {
         gradient.addColorStop(0.5, 'rgba(0, 188, 212, 0.03)');
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
       }
-      
+
       ctx.fillStyle = gradient;
       ctx.beginPath();
-      ctx.moveTo(xTop - rayWidth/2, 0);
-      ctx.lineTo(xTop + rayWidth/2, 0);
-      
+      ctx.moveTo(xTop - rayWidth / 2, 0);
+      ctx.lineTo(xTop + rayWidth / 2, 0);
+
       const xBottomL = xTop - rayWidth + Math.sin(angle) * height;
       const xBottomR = xTop + rayWidth + Math.sin(angle) * height;
-      
+
       ctx.lineTo(xBottomR, height);
       ctx.lineTo(xBottomL, height);
       ctx.closePath();
       ctx.fill();
     }
-    
+
     ctx.restore();
   }
 
@@ -492,9 +492,9 @@ document.addEventListener('DOMContentLoaded', () => {
     ripple.classList.add('ripple');
     ripple.style.left = `${x}px`;
     ripple.style.top = `${y}px`;
-    
+
     container.appendChild(ripple);
-    
+
     setTimeout(() => {
       ripple.remove();
     }, 850);
@@ -508,16 +508,16 @@ document.addEventListener('DOMContentLoaded', () => {
       mouse.y = clientY - rect.top;
       mouse.active = true;
     };
-    
+
     container.addEventListener('mousemove', (e) => {
       handleMove(e.clientX, e.clientY);
     });
-    
+
     container.addEventListener('mouseleave', () => {
       mouse.active = false;
       fishes.forEach(fish => fish.target = null);
     });
-    
+
     container.addEventListener('mouseenter', (e) => {
       handleMove(e.clientX, e.clientY);
     });
@@ -538,14 +538,14 @@ document.addEventListener('DOMContentLoaded', () => {
       mouse.active = false;
       fishes.forEach(fish => fish.target = null);
     });
-    
+
     container.addEventListener('click', (e) => {
       if (e.target !== canvas && e.target !== container) return;
-      
+
       const rect = canvas.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
       const clickY = e.clientY - rect.top;
-      
+
       triggerWaterRipple(e.clientX, e.clientY);
 
       // Kiểm tra thực thể được nhấp chọn
@@ -567,16 +567,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (!clickedEntity) {
           if (clickX >= aerator.x && clickX <= aerator.x + aerator.width &&
-              clickY >= aerator.y && clickY <= aerator.y + aerator.height) {
+            clickY >= aerator.y && clickY <= aerator.y + aerator.height) {
             clickedEntity = 'aerator';
           } else if (clickX >= wastePile.x && clickX <= wastePile.x + wastePile.width &&
-                     clickY >= wastePile.y && clickY <= wastePile.y + wastePile.height) {
+            clickY >= wastePile.y && clickY <= wastePile.y + wastePile.height) {
             clickedEntity = 'waste';
           } else if (clickX >= netEnclosure.x && clickX <= netEnclosure.x + netEnclosure.width &&
-                     clickY >= netEnclosure.y && clickY <= netEnclosure.y + netEnclosure.height) {
+            clickY >= netEnclosure.y && clickY <= netEnclosure.y + netEnclosure.height) {
             clickedEntity = 'net';
           } else if (clickX >= seedlingBucket.x && clickX <= seedlingBucket.x + seedlingBucket.width &&
-                     clickY >= seedlingBucket.y && clickY <= seedlingBucket.y + seedlingBucket.height) {
+            clickY >= seedlingBucket.y && clickY <= seedlingBucket.y + seedlingBucket.height) {
             clickedEntity = 'bucket';
           }
         }
@@ -634,12 +634,12 @@ document.addEventListener('DOMContentLoaded', () => {
           if (typeof tabContents !== 'undefined' && tabContents) {
             tabContents.forEach(c => c.classList.remove('active'));
           }
-          
+
           btn.classList.add('active');
           const tabId = `tab-${btn.dataset.tab}`;
           const tabEl = document.getElementById(tabId);
           if (tabEl) tabEl.classList.add('active');
-          
+
           // Đặt nổi bật bộ phận xương sống cho con cá đầu tiên (đại diện)
           fishes.forEach((fish, idx) => {
             if (idx === 0) {
@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
               fish.highlightedPart = null;
             }
           });
-          
+
           // Deselect active category when switching laws to avoid visual clutter
           if (activeCategory) {
             activeCategory = null;
@@ -750,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
               lifecycleStageVal.textContent = `Cá con (F${leadingFish.generation})`;
             } else {
               lifecycleStageVal.textContent = `Trưởng thành (F${leadingFish.generation})`;
-              
+
               if (typeof generationChart !== 'undefined' && generationChart) {
                 // Thêm cột mới vào biểu đồ thế hệ
                 const heightPercent = Math.min(100, 40 + (leadingFish.generation - 1) * 15);
@@ -778,10 +778,11 @@ document.addEventListener('DOMContentLoaded', () => {
             fish.lifecycleStage = 'adult';
             fish.generation = 1;
             fish.scale = fish.baseScale;
-            if (fish.type === 'tilapia') fish.segmentSpacing = 15 * fish.scale;
+            if (fish.type === 'tilapia') fish.segmentSpacing = 14 * fish.scale;
             else if (fish.type === 'grass_carp') fish.segmentSpacing = 17 * fish.scale;
             else if (fish.type === 'snakehead') fish.segmentSpacing = 19 * fish.scale;
-            else fish.segmentSpacing = 16 * fish.scale;
+            else if (fish.type === 'silver_carp') fish.segmentSpacing = 16 * fish.scale;
+            else fish.segmentSpacing = 15 * fish.scale;
             fish.x = (idx + 0.5) * (width / 5);
             fish.y = height / 3 + (height * 2 / 3) / 2;
             fish.vx = (Math.random() - 0.5) * 1.5 + (fish.type === 'goldfish' ? 1.0 : 2.0);
@@ -812,7 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const weatherWidget = document.getElementById('weather-widget');
     const weatherIcon = document.getElementById('weather-icon');
     const weatherStatusText = document.getElementById('weather-status-text');
-    
+
     if (weatherWidget) {
       weatherWidget.addEventListener('click', () => {
         weatherState = (weatherState === 'sunny' ? 'rainy' : 'sunny');
@@ -846,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
       categoryCards.forEach(card => {
         card.addEventListener('click', () => {
           const cat = card.dataset.category;
-          
+
           if (activeCategory === cat) {
             activeCategory = null;
             card.classList.remove('active');
@@ -862,7 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (cat === 'tatnhien-ngauhien') matchedEntity = 'weather';
             else if (cat === 'noidung-hinhthuc') matchedEntity = 'net';
             else if (cat === 'khamang-hienthuc') matchedEntity = 'bucket';
-            
+
             if (matchedEntity) {
               showPhilosophicalPopup(matchedEntity);
             }
@@ -880,20 +881,20 @@ document.addEventListener('DOMContentLoaded', () => {
         syncFishHighlightToActiveLaw();
       });
     }
-    
+
     // Đóng bảng giải thích khi click ra ngoài
     document.addEventListener('click', (e) => {
-      if (e.target.closest('#pond-popup') || 
-          e.target.closest('#category-explanation-box') || 
-          e.target.closest('.category-card') || 
-          e.target.closest('.weather-widget') ||
-          e.target.closest('.env-desc-widget') ||
-          e.target.closest('.philo-tabs') ||
-          e.target.closest('.quick-controls') ||
-          e.target.closest('.action-buttons')) {
+      if (e.target.closest('#pond-popup') ||
+        e.target.closest('#category-explanation-box') ||
+        e.target.closest('.category-card') ||
+        e.target.closest('.weather-widget') ||
+        e.target.closest('.env-desc-widget') ||
+        e.target.closest('.philo-tabs') ||
+        e.target.closest('.quick-controls') ||
+        e.target.closest('.action-buttons')) {
         return;
       }
-      
+
       if (activeCategory) {
         activeCategory = null;
         if (typeof pondPopup !== 'undefined' && pondPopup) pondPopup.classList.add('hidden');
@@ -921,14 +922,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupPhilosophyLeapListener() {
     window.addEventListener('philosophy-leap', (e) => {
       const data = e.detail;
-      
+
       triggerWaterRipple(data.x, data.y);
-      
+
       if (fishes[0]) {
         if (typeof toxicSlider !== 'undefined' && toxicSlider) toxicSlider.value = fishes[0].toxicLevel;
         if (typeof toxicVal !== 'undefined' && toxicVal) toxicVal.textContent = `${Math.round(fishes[0].toxicLevel)}%`;
       }
-      
+
       for (let i = 0; i < 35; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * 6 + 3;
@@ -943,7 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
           decay: Math.random() * 0.02 + 0.015
         });
       }
-      
+
       const container = document.getElementById('canvas-container');
       container.style.boxShadow = `inset 0 0 110px ${data.color}`;
       setTimeout(() => {
@@ -956,13 +957,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function setupEvolutionListener() {
     window.addEventListener('fish-evolved', (e) => {
       const data = e.detail;
-      
+
       if (fishes[0]) {
         const fish = fishes[0];
         const segsSnapshot = fish.segments.map(seg => ({ x: seg.x, y: seg.y, angle: seg.angle }));
         const widthsSnapshot = [...fish.widths];
         const stateColor = fish.getWaterState().secondary;
-        
+
         silhouettes.push({
           segments: segsSnapshot,
           widths: widthsSnapshot,
@@ -971,7 +972,7 @@ document.addEventListener('DOMContentLoaded', () => {
           alpha: 0.9,
           generation: fish.generation - 1
         });
-        
+
         for (let i = 0; i < 40; i++) {
           const angle = Math.random() * Math.PI * 2;
           const dist = Math.random() * 50;
@@ -996,7 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function resizeCanvas() {
     width = canvas.width = container.clientWidth;
     height = canvas.height = container.clientHeight;
-    
+
     const targetBubbleCount = Math.floor((width * height) / 28000);
     while (bubbles.length < targetBubbleCount) {
       bubbles.push(createBubble(true));
@@ -1010,17 +1011,17 @@ document.addEventListener('DOMContentLoaded', () => {
     aerator.y = height - 150;
     aerator.width = 90;
     aerator.height = 90;
-    
+
     wastePile.x = width / 2 - 120;
     wastePile.y = height - 40;
     wastePile.width = 160;
     wastePile.height = 40;
-    
+
     netEnclosure.x = width - 180;
     netEnclosure.y = height - 180;
     netEnclosure.width = 180;
     netEnclosure.height = 180;
-    
+
     seedlingBucket.x = width - 290;
     seedlingBucket.y = height / 3 - 70; // bucket sits on land right at water line
     seedlingBucket.width = 70;
@@ -1036,9 +1037,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const head = fish.segments[0];
     const body = fish.segments[4];
     const tail = fish.segments[8];
-    
+
     const stateColors = fish.getWaterState();
-    
+
     const labels = [
       {
         title: "Quy luật Mâu thuẫn",
@@ -1065,13 +1066,13 @@ document.addEventListener('DOMContentLoaded', () => {
         color: '#e040fb'
       }
     ];
-    
+
     labels.forEach(label => {
       const lx = label.target.x + label.offsetX;
       const ly = label.target.y + label.offsetY;
-      
+
       ctx.save();
-      
+
       ctx.beginPath();
       ctx.moveTo(label.target.x, label.target.y);
       const elbowX = lx + (label.offsetX > 0 ? -25 : 25);
@@ -1082,7 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.shadowBlur = 6;
       ctx.shadowColor = label.color;
       ctx.stroke();
-      
+
       ctx.beginPath();
       ctx.arc(label.target.x, label.target.y, 4.5, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
@@ -1090,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.strokeStyle = label.color;
       ctx.lineWidth = 2.5;
       ctx.stroke();
-      
+
       const padX = 14;
       ctx.font = "bold 12px 'Outfit', sans-serif";
       const titleWidth = ctx.measureText(label.title).width;
@@ -1100,18 +1101,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const cardH = 38;
       const cardX = lx - (label.offsetX > 0 ? 0 : cardW);
       const cardY = ly - cardH / 2;
-      
+
       ctx.fillStyle = 'rgba(8, 16, 32, 0.82)';
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
       ctx.lineWidth = 1;
       ctx.shadowBlur = 12;
       ctx.shadowColor = 'rgba(0,0,0,0.6)';
-      
+
       ctx.beginPath();
       ctx.roundRect(cardX, cardY, cardW, cardH, 8);
       ctx.fill();
       ctx.stroke();
-      
+
       ctx.beginPath();
       if (label.offsetX > 0) {
         ctx.roundRect(cardX, cardY, 4, cardH, [8, 0, 0, 8]);
@@ -1120,16 +1121,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       ctx.fillStyle = label.color;
       ctx.fill();
-      
+
       ctx.shadowBlur = 0;
       ctx.fillStyle = '#ffffff';
       ctx.font = "bold 11.5px 'Outfit', sans-serif";
       ctx.fillText(label.title, cardX + padX, cardY + 16);
-      
+
       ctx.fillStyle = '#90a4ae';
       ctx.font = "italic 9.5px 'Outfit', sans-serif";
       ctx.fillText(label.subtitle, cardX + padX, cardY + 28);
-      
+
       ctx.restore();
     });
   }
@@ -1138,7 +1139,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function drawCategoryHighlights(timestamp) {
     if (!activeCategory || fishes.length === 0) return;
     const fish = fishes[0];
-    
+
     switch (activeCategory) {
       case 'rieng-chung':
         // Highlight Cái chung - Pulsing border around the whole canvas
@@ -1148,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowBlur = 20;
         ctx.shadowColor = '#00e5ff';
         ctx.strokeRect(0, 0, width, height);
-        
+
         // Draw connecting overlay label pointing to background (centered top)
         ctx.shadowBlur = 0;
         ctx.fillStyle = '#00e5ff';
@@ -1157,7 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText("AO NƯỚC (CÁI CHUNG) - Môi trường sống bao quát", width / 2, 35);
         ctx.restore();
         break;
-        
+
       case 'nguyennhan-ketqua':
         // Highlight Nguyên nhân - Draw glowing pulse around all food pellets
         foods.forEach(pellet => {
@@ -1170,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ctx.beginPath();
           ctx.arc(pellet.x, pellet.y, pellet.radius + 8 + Math.sin(timestamp * 0.008) * 3, 0, Math.PI * 2);
           ctx.stroke();
-          
+
           // Draw text label next to pellet
           ctx.shadowBlur = 0;
           ctx.fillStyle = '#ffb74d';
@@ -1178,21 +1179,21 @@ document.addEventListener('DOMContentLoaded', () => {
           ctx.fillText("Nguyên nhân (Mồi)", pellet.x + 12, pellet.y + 3);
           ctx.restore();
         });
-        
+
         // Highlight Kết quả - pulse around active fish
         ctx.save();
         ctx.strokeStyle = '#00e676';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(fish.x, fish.y, 45 * fish.scale, 0, Math.PI*2);
+        ctx.arc(fish.x, fish.y, 45 * fish.scale, 0, Math.PI * 2);
         ctx.stroke();
-        
+
         ctx.fillStyle = '#69f0ae';
         ctx.font = "italic 9px 'Outfit', sans-serif";
         ctx.fillText("Kết quả (Sinh trưởng & Bước nhảy)", fish.x + 45 * fish.scale + 8, fish.y + 3);
         ctx.restore();
         break;
-        
+
       case 'tatnhien-ngauhien':
         // Highlight boundary reflection (Tất nhiên) - chỉ khoanh vùng nước (2/3 dưới)
         ctx.save();
@@ -1205,7 +1206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.textAlign = 'center';
         ctx.fillText("BIÊN AO (TẤT NHIÊN) - Cá chạm vào buộc phải quay lại", width / 2, height - 130);
         ctx.restore();
-        
+
         // Highlight trajectoryPath neon line (Ngẫu nhiên)
         ctx.save();
         ctx.shadowBlur = 15;
@@ -1220,7 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
         ctx.stroke();
-        
+
         // Label next to trail
         if (trajectoryPath.length > 15) {
           const pt = trajectoryPath[Math.floor(trajectoryPath.length / 2)];
@@ -1231,7 +1232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         ctx.restore();
         break;
-        
+
       case 'noidung-hinhthuc':
         if (fish.lifecycleStage !== 'adult') break;
         // Draw highlighted backbone/spinal (Nội dung) vs Body sections (Hình thức)
@@ -1247,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowBlur = 15;
         ctx.shadowColor = '#ffffff';
         ctx.stroke();
-        
+
         // Label
         const centerSeg = fish.segments[3];
         ctx.shadowBlur = 0;
@@ -1256,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fillText("NỘI DUNG (Cột xương/Sinh lực)", centerSeg.x + 20, centerSeg.y - 12);
         ctx.restore();
         break;
-        
+
       case 'banchat-hientuong':
         // Draw mathematical digital matrix grid (Bản chất)
         ctx.save();
@@ -1271,7 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         ctx.restore();
         break;
-        
+
       case 'khamang-hienthuc':
         // Draw possibility bridge (Dashed line from head to food target)
         if (fish.foodTarget) {
@@ -1287,7 +1288,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ctx.moveTo(headSeg.x, headSeg.y);
           ctx.lineTo(target.x, target.y);
           ctx.stroke();
-          
+
           // Text label over path
           ctx.shadowBlur = 0;
           ctx.fillStyle = '#ea80fc';
@@ -1309,7 +1310,7 @@ document.addEventListener('DOMContentLoaded', () => {
     'fish': {
       badge: "Cái riêng & Cái chung",
       title: "Con Cá Trắm cụ thể",
-      text: "Con cá này là Cái riêng (có cân nặng, vết sẹo riêng). Nhưng nó mang Cái chung của loài cá là phải thở bằng mang. Ao ô nhiễm thì cái riêng hay cái chung đều chịu chung số phận.",
+      text: "Con cá này là Cái riêng (có cân nặng, vết sẹo đơn nhất). Nhưng nó mang Cái chung của loài cá là phải thở bằng mang. Ao ô nhiễm thì cái riêng hay cái chung đều chịu chung số phận.",
       category: 'rieng-chung',
       x: () => fishes[0] ? fishes[0].x : width / 2,
       y: () => fishes[0] ? fishes[0].y : height / 2
@@ -1361,22 +1362,30 @@ document.addEventListener('DOMContentLoaded', () => {
   function showPhilosophicalPopup(entity, targetFish = null) {
     const data = entityData[entity];
     if (!data) return;
-    
+
     activePopupFish = targetFish || fishes[0];
-    
+
     popupBadge.textContent = data.badge;
     if (entity === 'fish' && activePopupFish) {
       popupTitle.textContent = `Chú ${activePopupFish.colors.name} cụ thể`;
+      let text = '';
+      if (activePopupFish.type === 'carp') text = "Cái riêng của con Cá Chép này là lớp vảy vàng đồng nhám, cặp râu cong và chiếc lưng gù.";
+      else if (activePopupFish.type === 'snakehead') text = "Cái riêng của con Cá Lóc này là hình dáng thon dài, hoa văn rằn ri và bản tính rình mồi hung dữ.";
+      else if (activePopupFish.type === 'tilapia') text = "Cái riêng của con Cá Rô Phi này là vây lưng có gai sắc nhọn và thân hình dẹt vạm vỡ.";
+      else if (activePopupFish.type === 'grass_carp') text = "Cái riêng của con Cá Trắm Cỏ này là hình dáng suôn mượt tối ưu cho bơi lội và không có râu.";
+      else if (activePopupFish.type === 'silver_carp') text = "Cái riêng của con Cá Mè này là chiếc đầu quá khổ, miệng hếch rộng và vây đuôi xẻ sâu.";
+      
+      popupText.innerHTML = text + " Tuy nhiên, nó vẫn mang <b>Cái chung</b> của mọi sinh vật trong ao: Cần oxy để hô hấp và chia sẻ chung một môi trường. Nếu ao bị ô nhiễm nặng, mọi Cái riêng đều chịu chung số phận.";
     } else {
       popupTitle.textContent = data.title;
+      popupText.innerHTML = typeof data.text === 'function' ? data.text() : data.text;
     }
-    popupText.innerHTML = data.text;
-    
+
     categoryCards.forEach(card => {
       if (card.dataset.category === data.category) {
         card.classList.add('active');
         activeCategory = data.category;
-        
+
         const info = categoryExplanations[data.category];
         explanationTitle.textContent = info.title;
         explanationText.innerHTML = info.text;
@@ -1393,12 +1402,12 @@ document.addEventListener('DOMContentLoaded', () => {
         fish.highlightedPart = null;
       }
     });
-    
+
     pondPopup.classList.remove('hidden');
-    
+
     const popWidth = pondPopup.offsetWidth || 340;
     const popHeight = pondPopup.offsetHeight || 180;
-    
+
     let posX = 0;
     let posY = 0;
 
@@ -1441,11 +1450,11 @@ document.addEventListener('DOMContentLoaded', () => {
       posX = data.x();
       posY = data.y();
     }
-    
+
     // Đảm bảo không bị tràn khỏi màn hình canvas
     let finalLeft = Math.max(10, Math.min(width - popWidth - 10, posX));
     let finalTop = Math.max(10, Math.min(height - popHeight - 10, posY));
-    
+
     pondPopup.style.left = `${finalLeft}px`;
     pondPopup.style.top = `${finalTop}px`;
   }
@@ -1459,19 +1468,19 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.lineWidth = 2;
     ctx.shadowBlur = aeratorOn ? 10 : 0;
     ctx.shadowColor = '#00e5ff';
-    
+
     ctx.beginPath();
     ctx.roundRect(aerator.x, aerator.y + 30, 45, 45, 6);
     ctx.fill();
     ctx.stroke();
-    
+
     ctx.beginPath();
     ctx.moveTo(aerator.x + 45, aerator.y + 52);
     ctx.lineTo(aerator.x + 65, aerator.y + 52);
     ctx.strokeStyle = 'rgba(255,255,255,0.6)';
     ctx.lineWidth = 4;
     ctx.stroke();
-    
+
     if (aeratorOn) {
       aerator.angle += 0.12;
       if (Math.random() < 0.45) {
@@ -1487,15 +1496,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     }
-    
+
     ctx.translate(aerator.x + 65, aerator.y + 52);
     ctx.rotate(aerator.angle);
-    
+
     ctx.fillStyle = 'rgba(200,200,200,0.9)';
     ctx.beginPath();
     ctx.arc(0, 0, 8, 0, Math.PI * 2);
     ctx.fill();
-    
+
     ctx.strokeStyle = aeratorOn ? '#00e5ff' : 'rgba(255,255,255,0.4)';
     ctx.lineWidth = 3;
     const blades = 6;
@@ -1505,7 +1514,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.moveTo(0, 0);
       ctx.lineTo(Math.cos(bAng) * 25, Math.sin(bAng) * 25);
       ctx.stroke();
-      
+
       ctx.fillStyle = aeratorOn ? '#00b0ff' : 'rgba(255,255,255,0.2)';
       ctx.beginPath();
       ctx.arc(Math.cos(bAng) * 25, Math.sin(bAng) * 25, 4, 0, Math.PI * 2);
@@ -1520,16 +1529,16 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.fillStyle = 'rgba(109, 76, 65, 0.85)';
     ctx.strokeStyle = 'rgba(76, 175, 80, 0.4)';
     ctx.lineWidth = 1.5;
-    
+
     const toxicScale = 0.6 + (fishes[0] ? fishes[0].toxicLevel / 100 : 0) * 1.5;
-    
+
     ctx.beginPath();
     ctx.ellipse(wastePile.x + 48 * toxicScale, height - 16 * toxicScale, 40 * toxicScale, 19 * toxicScale, 0, 0, Math.PI * 2);
     ctx.ellipse(wastePile.x + 112 * toxicScale, height - 11 * toxicScale, 51 * toxicScale, 16 * toxicScale, 0, 0, Math.PI * 2);
     ctx.ellipse(wastePile.x + 80 * toxicScale, height - 21 * toxicScale, 61 * toxicScale, 22 * toxicScale, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.stroke();
-    
+
     if (Math.random() < 0.08) {
       tailParticles.push({
         x: wastePile.x + (40 + Math.random() * 60) * toxicScale,
@@ -1551,18 +1560,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.setLineDash([4, 4]);
     ctx.shadowBlur = hoveredObject === 'net' ? 10 : 0;
     ctx.shadowColor = '#e040fb';
-    
+
     ctx.beginPath();
     ctx.moveTo(netEnclosure.x, height);
     ctx.lineTo(netEnclosure.x, netEnclosure.y);
     ctx.lineTo(width, netEnclosure.y);
     ctx.stroke();
-    
+
     ctx.setLineDash([]);
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
     ctx.fillStyle = 'rgba(100,100,100,0.8)';
     ctx.lineWidth = 3;
-    
+
     ctx.beginPath();
     ctx.moveTo(netEnclosure.x, height);
     ctx.lineTo(netEnclosure.x, netEnclosure.y - 10);
@@ -1570,7 +1579,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.beginPath();
     ctx.arc(netEnclosure.x, netEnclosure.y - 10, 4, 0, Math.PI * 2);
     ctx.fill();
-    
+
     ctx.fillStyle = 'rgba(224, 64, 251, 0.2)';
     ctx.strokeStyle = 'rgba(224, 64, 251, 0.4)';
     ctx.lineWidth = 1;
@@ -1581,16 +1590,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const fx = netEnclosure.x + 40 + col * 45 + Math.sin(fishTime + f * 1.5) * 15;
       const fy = netEnclosure.y + 50 + row * 40 + Math.cos(fishTime * 0.8 + f * 2) * 15;
       const fAng = Math.cos(fishTime + f * 1.5);
-      
+
       ctx.save();
       ctx.translate(fx, fy);
       ctx.rotate(fAng * 0.4 + (f === 0 ? Math.PI : 0));
-      
+
       ctx.beginPath();
       ctx.ellipse(0, 0, 10, 4, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
-      
+
       ctx.beginPath();
       ctx.moveTo(-10, 0);
       ctx.lineTo(-15, -3);
@@ -1608,12 +1617,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.lineWidth = 2;
     ctx.shadowBlur = hoveredObject === 'bucket' ? 10 : 0;
     ctx.shadowColor = '#00e5ff';
-    
+
     ctx.beginPath();
     ctx.roundRect(seedlingBucket.x, seedlingBucket.y, seedlingBucket.width, seedlingBucket.height, 4);
     ctx.fill();
     ctx.stroke();
-    
+
     ctx.strokeStyle = 'rgba(0,0,0,0.3)';
     ctx.lineWidth = 3;
     ctx.beginPath();
@@ -1622,7 +1631,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.moveTo(seedlingBucket.x, seedlingBucket.y + 50);
     ctx.lineTo(seedlingBucket.x + seedlingBucket.width, seedlingBucket.y + 50);
     ctx.stroke();
-    
+
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     const bucketTime = timestamp * 0.003;
     for (let f = 0; f < 3; f++) {
@@ -1658,7 +1667,7 @@ document.addEventListener('DOMContentLoaded', () => {
           widget.style.boxShadow = `0 4px 20px rgba(0, 229, 255, 0.3)`;
         }
       }
-      
+
       if (targetObj) {
         ctx.save();
         ctx.strokeStyle = objColor;
@@ -1666,7 +1675,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowBlur = 15;
         ctx.shadowColor = objColor;
         ctx.setLineDash([4, 4]);
-        
+
         ctx.beginPath();
         const pulse = Math.sin(timestamp * 0.005) * 6;
         ctx.roundRect(
@@ -1685,11 +1694,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hoveredObject) {
       let labelText = "";
       let lx = 0, ly = 0;
-      
+
       if (hoveredObject === 'fish') {
-        labelText = "Cá Trắm: Cái riêng & Cái chung";
-        lx = fishes[0] ? fishes[0].x : width / 2;
-        ly = fishes[0] ? fishes[0].y - 50 : height / 2;
+        const fishName = hoveredFish ? hoveredFish.colors.name : "Cá";
+        labelText = `${fishName}: Cái riêng & Cái chung`;
+        lx = hoveredFish ? hoveredFish.x : width / 2;
+        ly = hoveredFish ? hoveredFish.y - 50 : height / 2;
       } else if (hoveredObject === 'aerator') {
         labelText = aeratorOn ? "Click: Tắt máy sục khí (Bản chất & Hiện tượng)" : "Click: Bật máy sục khí (Bản chất & Hiện tượng)";
         lx = aerator.x + aerator.width / 2;
@@ -1707,20 +1717,20 @@ document.addEventListener('DOMContentLoaded', () => {
         lx = seedlingBucket.x + seedlingBucket.width / 2;
         ly = seedlingBucket.y - 12;
       }
-      
+
       if (labelText) {
         ctx.save();
         ctx.font = "500 10.5px 'Outfit', sans-serif";
         const txtW = ctx.measureText(labelText).width;
-        
+
         ctx.fillStyle = 'rgba(8, 16, 32, 0.85)';
         ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.roundRect(lx - txtW/2 - 8, ly - 18, txtW + 16, 22, 6);
+        ctx.roundRect(lx - txtW / 2 - 8, ly - 18, txtW + 16, 22, 6);
         ctx.fill();
         ctx.stroke();
-        
+
         ctx.fillStyle = '#fff';
         ctx.textAlign = 'center';
         ctx.shadowBlur = 0;
@@ -1740,7 +1750,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.lineCap = 'round';
       ctx.shadowBlur = 12;
       ctx.shadowColor = '#4caf50';
-      
+
       ctx.beginPath();
       ctx.moveTo(plant.x, height);
       ctx.quadraticCurveTo(plant.x + sway * 0.5, height - plant.height * 0.5, plant.x + sway, height - plant.height);
@@ -1752,10 +1762,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cập nhật và vẽ vi khuẩn ở đáy ao (giới hạn trong 2/3 vùng nước phía dưới)
   function updateAndDrawBacteria() {
     ctx.save();
-    
+
     // Nhiệt độ nước ảnh hưởng trực tiếp đến tốc độ di động và sự dao động của vi khuẩn
-    const tempMult = waterTemp / 24; 
-    
+    const tempMult = waterTemp / 24;
+
     bacteriaList.forEach(b => {
       if (!fishes[0] || !fishes[0].isDead) {
         b.x += b.vx * tempMult;
@@ -1763,14 +1773,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       b.wiggle += 0.03 * tempMult;
       b.x += Math.sin(b.wiggle) * 0.15;
-      
+
       if (b.x < 0) b.x = width;
       if (b.x > width) b.x = 0;
-      
+
       const waterY = height / 3;
       if (b.y < waterY) b.y = height;
       if (b.y > height) b.y = waterY;
-      
+
       ctx.fillStyle = '#ff9800'; // Màu cam phát sáng phát tín hiệu nhiệt
       ctx.shadowBlur = 6;
       ctx.shadowColor = '#ff9800';
@@ -1784,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 15. Vẽ cấu trúc ao hồ (1/3 phía trên là bầu trời, 2/3 phía dưới là nước)
   function drawPondStructure(ctx, timestamp) {
     const waterY = height / 3;
-    
+
     // 1. Vẽ bầu trời (1/3 phía trên)
     let skyGrad = ctx.createLinearGradient(0, 0, 0, waterY);
     if (currentTheme === 'cyber') {
@@ -1810,24 +1820,24 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.save();
       const sunMoonX = width * 3 / 4;
       const sunMoonY = height / 8;
-      
+
       if (isDay) {
         // Vẽ Mặt Trời tỏa nắng rực rỡ
         const sunRadius = 24;
         let opacity = weatherState === 'rainy' ? 0.35 : 1.0; // Giảm độ sáng khi trời mưa bão
-        
+
         ctx.globalAlpha = opacity;
         let sunGrad = ctx.createRadialGradient(sunMoonX, sunMoonY, 2, sunMoonX, sunMoonY, sunRadius * 2.2);
         sunGrad.addColorStop(0, '#ffffff');
         sunGrad.addColorStop(0.2, '#fff176');
         sunGrad.addColorStop(0.5, '#f57c00');
         sunGrad.addColorStop(1, 'rgba(245, 124, 0, 0)');
-        
+
         ctx.fillStyle = sunGrad;
         ctx.beginPath();
         ctx.arc(sunMoonX, sunMoonY, sunRadius * 2.2, 0, Math.PI * 2);
         ctx.fill();
-        
+
         // Vẽ vầng hào quang nhấp nháy nhẹ quanh mặt trời
         if (weatherState !== 'rainy') {
           ctx.beginPath();
@@ -1843,7 +1853,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.shadowBlur = weatherState === 'rainy' ? 8 : 20;
         ctx.shadowColor = '#fffde7';
         ctx.globalAlpha = weatherState === 'rainy' ? 0.4 : 1.0;
-        
+
         ctx.beginPath();
         ctx.arc(0, 0, 18, -Math.PI / 2, Math.PI / 2, false);
         ctx.arc(6, 0, 16, Math.PI / 2, -Math.PI / 2, true);
@@ -1860,14 +1870,14 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.beginPath();
         ctx.moveTo(line.x, line.y);
         ctx.lineTo(line.x - line.length, line.y);
-        
+
         // Tạo hiệu ứng lướt gió mờ nhạt dần về hai đầu
         let windGrad = ctx.createLinearGradient(line.x - line.length, 0, line.x, 0);
         const opacity = weatherState === 'rainy' ? line.opacity * 2.2 : line.opacity;
         windGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
         windGrad.addColorStop(0.5, `rgba(255, 255, 255, ${opacity})`);
         windGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        
+
         ctx.strokeStyle = windGrad;
         ctx.lineWidth = weatherState === 'rainy' ? 1.5 : 0.8;
         ctx.stroke();
@@ -1880,7 +1890,7 @@ document.addEventListener('DOMContentLoaded', () => {
       clouds.forEach(cloud => {
         ctx.save();
         ctx.globalAlpha = weatherState === 'rainy' ? cloud.opacity * 0.95 : cloud.opacity * 0.7;
-        
+
         let grad = ctx.createRadialGradient(cloud.x, cloud.y, 0, cloud.x, cloud.y, cloud.size * 2.5);
         if (weatherState === 'rainy') {
           // Đám mây dông xám xịt tích nhiều hơi nước
@@ -1893,7 +1903,7 @@ document.addEventListener('DOMContentLoaded', () => {
           grad.addColorStop(0.6, 'rgba(224, 247, 250, 0.75)');
           grad.addColorStop(1, 'rgba(224, 247, 250, 0)');
         }
-        
+
         ctx.fillStyle = grad;
         ctx.beginPath();
         const s = cloud.size;
@@ -1933,17 +1943,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const dockX = seedlingBucket.x - 20;
     const dockY = waterY;
     const dockW = width - dockX;
-    
+
     // Vẽ ba cột gỗ cắm sâu dưới nước
     ctx.fillStyle = '#4e342e'; // Màu nâu gỗ sẫm
     ctx.strokeStyle = '#3e2723';
     ctx.lineWidth = 1;
-    
+
     // Cột gỗ 1
     ctx.beginPath();
     ctx.roundRect(dockX + 15, dockY, 8, 40, 2);
     ctx.fill(); ctx.stroke();
-    
+
     // Cột gỗ 2
     ctx.beginPath();
     ctx.roundRect(dockX + 60, dockY, 8, 45, 2);
@@ -1953,14 +1963,14 @@ document.addEventListener('DOMContentLoaded', () => {
     ctx.beginPath();
     ctx.roundRect(width - 25, dockY, 8, 45, 2);
     ctx.fill(); ctx.stroke();
-    
+
     // Vẽ ván sàn gỗ cầu tàu nằm ngay mép nước
     ctx.fillStyle = '#8d6e63'; // Màu gỗ ấm sáng
     ctx.beginPath();
     ctx.roundRect(dockX, dockY - 6, dockW + 10, 8, 2);
     ctx.fill();
     ctx.stroke();
-    
+
     // Vẽ khe ghép các tấm ván gỗ và các lỗ đinh cố định sàn
     ctx.fillStyle = '#5d4037';
     for (let px = dockX + 10; px < width; px += 25) {
@@ -1996,7 +2006,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 14. Draw subtle scientific overlay grid and velocity vector (Khoa học theme)
   function drawScientificOverlays(ctx) {
     if (currentTheme !== 'cyber') return;
-    
+
     // Draw subtle grid (even fainter than active category)
     ctx.save();
     ctx.strokeStyle = 'rgba(0, 229, 255, 0.04)';
@@ -2020,14 +2030,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const arrowLength = 40 * fish.scale;
         const ax = head.x + Math.cos(angle) * arrowLength;
         const ay = head.y + Math.sin(angle) * arrowLength;
-        
+
         ctx.beginPath();
         ctx.moveTo(head.x, head.y);
         ctx.lineTo(ax, ay);
         ctx.strokeStyle = 'rgba(0, 229, 255, 0.4)';
         ctx.lineWidth = 1.5;
         ctx.stroke();
-        
+
         // Arrow head
         ctx.fillStyle = 'rgba(0, 229, 255, 0.4)';
         ctx.beginPath();
@@ -2036,7 +2046,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.lineTo(ax - 6 * Math.cos(angle + 0.5), ay - 6 * Math.sin(angle + 0.5));
         ctx.closePath();
         ctx.fill();
-        
+
         ctx.restore();
       }
     }
@@ -2045,16 +2055,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // 13. Main Frame Animation Loop
   function loop(timestamp) {
     ctx.clearRect(0, 0, width, height);
-    
+
     // Draw sky/water split
     drawPondStructure(ctx, timestamp);
-    
+
     // Tính toán chỉ số khung hình FPS
     frameCount++;
     const dt = timestamp - lastTime;
     fpsTimer += dt;
     lastTime = timestamp;
-    
+
     if (fpsTimer >= 1000) {
       fps = Math.round((frameCount * 1000) / fpsTimer);
       fpsCounter.textContent = fps;
@@ -2072,7 +2082,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.fillStyle = 'rgba(3, 10, 24, 0.45)';
       ctx.fillRect(0, 0, width, height);
     }
-    
+
     // Draw Scientific Overlays (Grid and Velocity Vector for Khoa học theme)
     drawScientificOverlays(ctx);
 
@@ -2082,7 +2092,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mouse.active) {
       const mx = mouse.x;
       const my = mouse.y;
-      
+
       // Kiểm tra xem chuột có hover gần bất kỳ con cá nào không
       for (let i = 0; i < fishes.length; i++) {
         const fish = fishes[i];
@@ -2107,19 +2117,19 @@ document.addEventListener('DOMContentLoaded', () => {
           break;
         }
       }
-      
+
       if (!hoveredObject) {
         if (mx >= aerator.x && mx <= aerator.x + aerator.width &&
-            my >= aerator.y && my <= aerator.y + aerator.height) {
+          my >= aerator.y && my <= aerator.y + aerator.height) {
           hoveredObject = 'aerator';
         } else if (mx >= wastePile.x && mx <= wastePile.x + wastePile.width &&
-                 my >= wastePile.y && my <= wastePile.y + wastePile.height) {
+          my >= wastePile.y && my <= wastePile.y + wastePile.height) {
           hoveredObject = 'waste';
         } else if (mx >= netEnclosure.x && mx <= netEnclosure.x + netEnclosure.width &&
-                 my >= netEnclosure.y && my <= netEnclosure.y + netEnclosure.height) {
+          my >= netEnclosure.y && my <= netEnclosure.y + netEnclosure.height) {
           hoveredObject = 'net';
         } else if (mx >= seedlingBucket.x && mx <= seedlingBucket.x + seedlingBucket.width &&
-                 my >= seedlingBucket.y && my <= seedlingBucket.y + seedlingBucket.height) {
+          my >= seedlingBucket.y && my <= seedlingBucket.y + seedlingBucket.height) {
           hoveredObject = 'bucket';
         }
       }
@@ -2130,7 +2140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fishes.forEach(fish => {
       fish.isHovered = (hoveredObject === 'fish' && hoveredFish === fish);
     });
-    
+
     // Sync toxic controls & quality state footer label in UI on every frame
     if (fishes[0]) {
       const fish = fishes[0];
@@ -2140,7 +2150,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof toxicVal !== 'undefined' && toxicVal) {
         toxicVal.textContent = `${Math.round(fish.toxicLevel)}%`;
       }
-      
+
       const state = fish.getWaterState();
       activeQualityState.textContent = state.name;
       activeQualityState.style.color = state.secondary;
@@ -2156,7 +2166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       if (isDay && weatherState === 'sunny') {
         // Nắng ráo, ban ngày: tảo quang hợp mạnh, duy trì mức oxy tốt (80-100%)
-        targetOxygen = 90; 
+        targetOxygen = 90;
         currentOxygen += (targetOxygen - currentOxygen) * 0.005;
       } else {
         // Mưa hoặc ban đêm: quang hợp yếu, oxy giảm dần
@@ -2180,7 +2190,7 @@ document.addEventListener('DOMContentLoaded', () => {
         oxygenProgress.style.background = 'linear-gradient(90deg, #0288d1, #00e5ff)';
       }
     }
-    
+
     // Cập nhật vị trí các đám mây di động trên bầu trời
     clouds.forEach(cloud => {
       const speedMult = weatherState === 'rainy' ? 2.2 : 1.0;
@@ -2211,23 +2221,23 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.save();
       ctx.strokeStyle = 'rgba(174, 234, 253, 0.25)';
       ctx.lineWidth = 1.2;
-      
+
       const windForce = -2.5; // Lực gió thổi ngang làm xiên màn mưa
-      
+
       rainDrops.forEach(r => {
         r.y += r.speed;
         r.x += windForce * (r.speed / 10);
-        
+
         const waterY = height / 3;
         const currentWave = Math.sin(timestamp * 0.0025 + r.x * 0.02) * 3.5;
-        
+
         if (r.y > waterY + currentWave) {
           // Vẽ hiệu ứng giọt bắn nhỏ khi nước mưa chạm mặt ao nhấp nhô
           ctx.beginPath();
           ctx.arc(r.x, waterY + currentWave, 2.5, 0, Math.PI * 2);
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
           ctx.stroke();
-          
+
           r.y = -20;
           r.x = Math.random() * (width + 100); // Sinh mưa xa hơn về bên phải để bù cho độ lệch gió
         }
@@ -2250,9 +2260,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Di chuyển hạt Oxy
       p.y += p.vy;
       p.x += p.vx + Math.sin(timestamp * 0.005 + p.y * 0.01) * 0.2;
-      
+
       const waterY = height / 3;
-      
+
       // Xử lý khi hạt vượt qua ranh giới mặt nước hoặc đáy ao
       let needsReset = false;
       if (p.vy < 0 && p.y < waterY) {
@@ -2260,7 +2270,7 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (p.vy > 0 && p.y > height - 10) {
         needsReset = true;
       }
-      
+
       if (needsReset) {
         if (weatherState === 'rainy' && Math.random() < 0.45) {
           // Mưa hòa tan Oxy: hạt sinh ra ở bề mặt nước và chìm dần xuống dưới
@@ -2286,12 +2296,12 @@ document.addEventListener('DOMContentLoaded', () => {
           p.alpha = 0.0;
         }
       }
-      
+
       // Chỉ vẽ những hạt Oxy đang hoạt động (alpha > 0)
       if (p.alpha > 0) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        
+
         // Hạt hòa tan từ mưa có màu xanh lam nước mát, hạt quang hợp có màu xanh neon rực rỡ
         const color = p.vy > 0 ? 'rgba(128, 222, 234, ' + p.alpha + ')' : 'rgba(0, 229, 255, ' + p.alpha + ')';
         ctx.fillStyle = color;
@@ -2314,18 +2324,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const timePhase = (timestamp * 0.002) % 1;
         const startX = plant.x;
         const startY = height - plant.height;
-        
+
         for (let a = 0; a < 3; a++) {
           const ang = -Math.PI / 2 + (a - 1) * 0.35;
           const dist = 30 + timePhase * 80;
           const ax = startX + Math.cos(ang) * dist;
           const ay = startY + Math.sin(ang) * dist;
-          
+
           ctx.beginPath();
           ctx.moveTo(startX, startY);
           ctx.lineTo(ax, ay);
           ctx.stroke();
-          
+
           ctx.fillStyle = `rgba(0, 230, 118, ${0.75 * arrowAlpha})`;
           ctx.beginPath();
           ctx.arc(ax, ay, 2.5, 0, Math.PI * 2);
@@ -2345,22 +2355,22 @@ document.addEventListener('DOMContentLoaded', () => {
       const fish = fishes[0];
       const timePhase = (timestamp * 0.002) % 1;
       const arrowCount = 8;
-      
+
       for (let a = 0; a < arrowCount; a++) {
         const angle = (a / arrowCount) * Math.PI * 2 + (timestamp * 0.0004);
         const rStart = 140 - timePhase * 80;
         const rEnd = rStart - 25;
-        
+
         const sx = fish.x + Math.cos(angle) * rStart;
         const sy = fish.y + Math.sin(angle) * rStart;
         const ex = fish.x + Math.cos(angle) * rEnd;
         const ey = fish.y + Math.sin(angle) * rEnd;
-        
+
         ctx.beginPath();
         ctx.moveTo(sx, sy);
         ctx.lineTo(ex, ey);
         ctx.stroke();
-        
+
         ctx.fillStyle = 'rgba(0, 229, 255, 0.6)';
         ctx.beginPath();
         ctx.arc(ex, ey, 2, 0, Math.PI * 2);
@@ -2384,7 +2394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
       }
     }
-    
+
     // 3. Draw trajectory travel path (Đường xoắn ốc)
     if (fishes[0] && fishes[0].maxSpeed > 0 && fishes[0].lifecycleStage === 'adult') {
       const head = fishes[0].segments[0];
@@ -2393,7 +2403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trajectoryPath.shift();
       }
     }
-    
+
     ctx.save();
     ctx.beginPath();
     if (trajectoryPath.length > 1) {
@@ -2414,11 +2424,11 @@ document.addEventListener('DOMContentLoaded', () => {
     silhouettes.forEach((sil) => {
       sil.alpha -= 0.0012;
       if (sil.alpha <= 0) return;
-      
+
       ctx.globalAlpha = sil.alpha;
       ctx.strokeStyle = sil.color;
       ctx.lineWidth = 1;
-      
+
       sil.segments.forEach((seg, i) => {
         ctx.beginPath();
         ctx.arc(seg.x, seg.y, sil.widths[i] * sil.scale, 0, Math.PI * 2);
@@ -2426,7 +2436,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.fill();
         ctx.stroke();
       });
-      
+
       const headSeg = sil.segments[0];
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.font = "italic 9px 'Outfit', sans-serif";
@@ -2435,13 +2445,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     silhouettes = silhouettes.filter(sil => sil.alpha > 0);
     ctx.restore();
-    
+
     // 5. Cập nhật và vẽ các hạt đuôi xoắn ốc phản quang cho tất cả các cá bơi
     fishes.forEach(fish => {
       if (fish.lifecycleStage === 'adult' && !fish.isDead) {
         const tail = fish.segments[fish.numSegments - 1];
         const state = fish.getWaterState();
-        
+
         if (Math.random() < 0.65) {
           tailParticles.push({
             x: tail.x,
@@ -2458,7 +2468,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
-    
+
     ctx.save();
     tailParticles.forEach((p) => {
       p.angleOffset += 0.15;
@@ -2466,7 +2476,7 @@ document.addEventListener('DOMContentLoaded', () => {
       p.x += p.vx + Math.sin(p.angleOffset) * spiralScale * 0.4;
       p.y += p.vy + Math.cos(p.angleOffset) * spiralScale * 0.4;
       p.alpha -= p.decay;
-      
+
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
@@ -2477,7 +2487,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     tailParticles = tailParticles.filter(p => p.alpha > 0);
     ctx.restore();
-    
+
     // 6. Update and Draw Leap Flash Particles
     ctx.save();
     leapParticles.forEach((p) => {
@@ -2486,7 +2496,7 @@ document.addEventListener('DOMContentLoaded', () => {
       p.vx *= 0.95;
       p.vy *= 0.95;
       p.alpha -= p.decay;
-      
+
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
       ctx.fillStyle = p.color;
@@ -2497,7 +2507,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     leapParticles = leapParticles.filter(p => p.alpha > 0);
     ctx.restore();
-    
+
     // Cập nhật vị trí của popup Triết học Cái riêng & Cái chung bám sát theo chú cá đang bơi
     if (!pondPopup.classList.contains('hidden') && activeCategory === 'rieng-chung' && activePopupFish) {
       const popWidth = 300;
@@ -2507,7 +2517,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pondPopup.style.left = `${finalLeft}px`;
       pondPopup.style.top = `${finalTop}px`;
     }
-    
+
     // 7. Cập nhật vật lý và vẽ toàn bộ danh sách cá
     fishes.forEach(fish => {
       if (mouse.active) {
@@ -2515,13 +2525,13 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         fish.target = null;
       }
-      
+
       // Tìm thức ăn gần nhất cho từng chú cá bơi tự do
       if (foods.length > 0) {
         if (!fish.foodTarget || fish.foodTarget.eaten || !foods.includes(fish.foodTarget)) {
           let closestFood = null;
           let minDist = 999999;
-          
+
           foods.forEach(pellet => {
             if (!pellet.eaten) {
               const dist = Math.hypot(pellet.x - fish.x, pellet.y - fish.y);
@@ -2531,7 +2541,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           });
-          
+
           if (minDist < 600) {
             fish.foodTarget = closestFood;
           } else {
@@ -2541,10 +2551,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         fish.foodTarget = null;
       }
-      
+
       // Cập nhật vị trí uốn lượn tự nhiên, kiểm tra Oxy, nhiệt độ và các chú cá xung quanh để tránh nhau
       fish.update(width, height, currentOxygen, waterTemp, fishes);
-      
+
       // Giới hạn không cho cá khác lọt vào vùng lưới quây cá lóc
       if (fish.type !== 'snakehead' && fish.lifecycleStage === 'adult') {
         const buffer = 45 * fish.scale;
@@ -2561,14 +2571,14 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       }
-      
+
       // Xử lý khi cá ăn thức ăn
       if (fish.foodTarget && fish.foodTarget.eaten) {
         const pelletType = fish.foodTarget.type;
         fishes.forEach(f => f.adjustToxicLevel(pelletType === 'cold' ? -10 : 5));
-        
+
         fish.foodTarget = null;
-        
+
         // Hiệu ứng phình lớn rồi co nhỏ lại khi nuốt mồi
         const originalScale = fish.scale;
         fish.scale = Math.min(fish.scale + 0.12, 2.1);
@@ -2583,7 +2593,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }, 30);
         }, 1200);
       }
-      
+
       // Vẽ chú cá lên Canvas kèm theo Thế giới quan (theme) hiện tại
       fish.draw(ctx, currentTheme);
 
@@ -2614,29 +2624,29 @@ document.addEventListener('DOMContentLoaded', () => {
       p.y += p.vy;
       p.vx += (Math.random() - 0.5) * 0.25; // wander
       p.vy += (Math.random() - 0.5) * 0.25;
-      
+
       // restrict seedling particles to stay below water surface
       const waterY = height / 3;
       if (p.y < waterY + 5) {
         p.y = waterY + 5;
         p.vy *= -0.5; // bounce down
       }
-      
+
       // limit speed
       const speed = Math.hypot(p.vx, p.vy);
       if (speed > 2.5) {
         p.vx = (p.vx / speed) * 2.5;
         p.vy = (p.vy / speed) * 2.5;
       }
-      
+
       p.angle = Math.atan2(p.vy, p.vx);
       p.wagTime += 0.3;
       p.life -= p.decay;
-      
+
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.angle);
-      
+
       // Draw tiny seedling body
       ctx.beginPath();
       ctx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
@@ -2644,7 +2654,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.shadowBlur = 6;
       ctx.shadowColor = '#00e5ff';
       ctx.fill();
-      
+
       // Tail wag
       const tailWag = Math.sin(p.wagTime) * 0.5;
       ctx.beginPath();
@@ -2653,18 +2663,18 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.strokeStyle = `rgba(0, 229, 255, ${p.life})`;
       ctx.lineWidth = 1.5;
       ctx.stroke();
-      
+
       ctx.restore();
     });
     seedlingParticles = seedlingParticles.filter(p => p.life > 0);
     ctx.restore();
-    
+
     // 8. Draw Dynamic Philosophy Labels
     drawPhilosophyLabels(ctx);
-    
+
     // 9. Draw active Category overlays
     drawCategoryHighlights(timestamp);
-    
+
     requestAnimationFrame(loop);
   }
 
