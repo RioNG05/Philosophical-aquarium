@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6 Categories Explanations Data
   const categoryExplanations = {
     'rieng-chung': {
-      title: "Cái riêng & Cái chung",
-      text: "Con cá này là Cái riêng (có cân nặng, vết sẹo riêng). Nhưng nó mang Cái chung của loài cá là phải thở bằng mang. Ao ô nhiễm thì cái riêng hay cái chung đều chịu chung số phận."
+      title: "Cái chung, Cái riêng & Cái đơn nhất",
+      text: "Mỗi chú cá mang <b>Cái chung</b> (thuộc tính của loài cá: thở bằng mang, sống dưới nước), là một <b>Cái riêng</b> (tổng thể cấu thành nên chú cá đó), và sở hữu <b>Cái đơn nhất</b> (đặc điểm không lặp lại: vết sẹo, cân nặng chính xác lúc này, hay vị trí đang bơi). Ao ô nhiễm thì Cái chung bị phá vỡ, kéo theo sự hủy diệt của mọi Cái riêng và Cái đơn nhất."
     },
     'nguyennhan-ketqua': {
       title: "Nguyên nhân & Kết quả",
@@ -1308,8 +1308,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const entityData = {
     'fish': {
-      badge: "Cái riêng & Cái chung",
-      title: "Con Cá Trắm cụ thể",
+      badge: "Cái chung, Cái riêng & Cái đơn nhất",
+      title: "Con Cá cụ thể",
       text: "Con cá này là Cái riêng (có cân nặng, vết sẹo đơn nhất). Nhưng nó mang Cái chung của loài cá là phải thở bằng mang. Ao ô nhiễm thì cái riêng hay cái chung đều chịu chung số phận.",
       category: 'rieng-chung',
       x: () => fishes[0] ? fishes[0].x : width / 2,
@@ -1369,13 +1369,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (entity === 'fish' && activePopupFish) {
       popupTitle.textContent = `Chú ${activePopupFish.colors.name} cụ thể`;
       let text = '';
-      if (activePopupFish.type === 'carp') text = "Cái riêng của con Cá Chép này là lớp vảy vàng đồng nhám, cặp râu cong và chiếc lưng gù.";
-      else if (activePopupFish.type === 'snakehead') text = "Cái riêng của con Cá Lóc này là hình dáng thon dài, hoa văn rằn ri và bản tính rình mồi hung dữ.";
-      else if (activePopupFish.type === 'tilapia') text = "Cái riêng của con Cá Rô Phi này là vây lưng có gai sắc nhọn và thân hình dẹt vạm vỡ.";
-      else if (activePopupFish.type === 'grass_carp') text = "Cái riêng của con Cá Trắm Cỏ này là hình dáng suôn mượt tối ưu cho bơi lội và không có râu.";
-      else if (activePopupFish.type === 'silver_carp') text = "Cái riêng của con Cá Mè này là chiếc đầu quá khổ, miệng hếch rộng và vây đuôi xẻ sâu.";
+      if (activePopupFish.type === 'carp') text = "<b>Cái riêng</b> của con Cá Chép này là tổng thể của vảy vàng đồng, cặp râu và lưng gù. <b>Cái đơn nhất</b> là tọa độ dòng nước nó đang bơi và kích thước chính xác của nó.";
+      else if (activePopupFish.type === 'snakehead') text = "<b>Cái riêng</b> của con Cá Lóc này là dáng hình ống, hoa văn rằn ri và bản tính rình mồi. <b>Cái đơn nhất</b> là mục tiêu cụ thể mà radar của nó vừa khóa.";
+      else if (activePopupFish.type === 'tilapia') text = "<b>Cái riêng</b> của con Cá Rô Phi này là vây lưng có gai nhọn và thân dẹt. <b>Cái đơn nhất</b> là lượng khí độc tuyệt đối mà cơ thể nó đang tích tụ lúc này.";
+      else if (activePopupFish.type === 'grass_carp') text = "<b>Cái riêng</b> của Cá Trắm Cỏ này là hình dáng suôn mượt và không râu. <b>Cái đơn nhất</b> là khoảng cách chính xác tính bằng milimet từ nó đến đống thức ăn.";
+      else if (activePopupFish.type === 'silver_carp') text = "<b>Cái riêng</b> của con Cá Mè này là chiếc đầu quá khổ và đuôi xẻ sâu. <b>Cái đơn nhất</b> là tọa độ phân bố ngẫu nhiên của từng đốm hoa văn trên thân nó.";
       
-      popupText.innerHTML = text + " Tuy nhiên, nó vẫn mang <b>Cái chung</b> của mọi sinh vật trong ao: Cần oxy để hô hấp và chia sẻ chung một môi trường. Nếu ao bị ô nhiễm nặng, mọi Cái riêng đều chịu chung số phận.";
+      popupText.innerHTML = text + "<br/><br/>Tuy nhiên, nó mang <b>Cái chung</b> của sinh giới: Cần oxy hô hấp và tuần hoàn sinh tử. Nếu ao ô nhiễm, Cái chung bị hủy hoại kéo theo sự tan biến của mọi Cái riêng và Cái đơn nhất.";
     } else {
       popupTitle.textContent = data.title;
       popupText.innerHTML = typeof data.text === 'function' ? data.text() : data.text;
@@ -1697,7 +1697,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (hoveredObject === 'fish') {
         const fishName = hoveredFish ? hoveredFish.colors.name : "Cá";
-        labelText = `${fishName}: Cái riêng & Cái chung`;
+        labelText = `${fishName}: Cái chung, Cái riêng & Cái đơn nhất`;
         lx = hoveredFish ? hoveredFish.x : width / 2;
         ly = hoveredFish ? hoveredFish.y - 50 : height / 2;
       } else if (hoveredObject === 'aerator') {
