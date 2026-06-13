@@ -1369,11 +1369,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (entity === 'fish' && activePopupFish) {
       popupTitle.textContent = `Chú ${activePopupFish.colors.name} cụ thể`;
       let text = '';
-      if (activePopupFish.type === 'carp') text = "<b>Cái riêng</b> của con Cá Chép này là tổng thể của vảy vàng đồng, cặp râu và lưng gù. <b>Cái đơn nhất</b> là tọa độ dòng nước nó đang bơi và kích thước chính xác của nó.";
-      else if (activePopupFish.type === 'snakehead') text = "<b>Cái riêng</b> của con Cá Lóc này là dáng hình ống, hoa văn rằn ri và bản tính rình mồi. <b>Cái đơn nhất</b> là mục tiêu cụ thể mà radar của nó vừa khóa.";
-      else if (activePopupFish.type === 'tilapia') text = "<b>Cái riêng</b> của con Cá Rô Phi này là vây lưng có gai nhọn và thân dẹt. <b>Cái đơn nhất</b> là lượng khí độc tuyệt đối mà cơ thể nó đang tích tụ lúc này.";
-      else if (activePopupFish.type === 'grass_carp') text = "<b>Cái riêng</b> của Cá Trắm Cỏ này là hình dáng suôn mượt và không râu. <b>Cái đơn nhất</b> là khoảng cách chính xác tính bằng milimet từ nó đến đống thức ăn.";
-      else if (activePopupFish.type === 'silver_carp') text = "<b>Cái riêng</b> của con Cá Mè này là chiếc đầu quá khổ và đuôi xẻ sâu. <b>Cái đơn nhất</b> là tọa độ phân bố ngẫu nhiên của từng đốm hoa văn trên thân nó.";
+      if (activePopupFish.type === 'carp') text = "Con cá chép cụ thể này là <b>Cái riêng</b>. <b>Cái đơn nhất</b> của nó là kích thước chính xác, màu sắc và hoa văn riêng trên cơ thể.";
+      else if (activePopupFish.type === 'snakehead') text = "Con cá lóc cụ thể này là <b>Cái riêng</b>. <b>Cái đơn nhất</b> của nó là kích thước chính xác, màu sắc và hoa văn riêng trên cơ thể.";
+      else if (activePopupFish.type === 'tilapia') text = "Con cá rô phi cụ thể này là <b>Cái riêng</b>. <b>Cái đơn nhất</b> của nó là kích thước chính xác, màu sắc và hoa văn riêng trên cơ thể.";
+      else if (activePopupFish.type === 'grass_carp') text = "Con cá trắm cụ thể này là <b>Cái riêng</b>. <b>Cái đơn nhất</b> của nó là kích thước chính xác, màu sắc và hoa văn riêng trên cơ thể.";
+      else if (activePopupFish.type === 'silver_carp') text = "Con cá mè cụ thể này là <b>Cái riêng</b>. <b>Cái đơn nhất</b> của nó là kích thước chính xác, màu sắc và hoa văn riêng trên cơ thể.";
       
       popupText.innerHTML = text + "<br/><br/>Tuy nhiên, nó mang <b>Cái chung</b> của sinh giới: Cần oxy hô hấp và tuần hoàn sinh tử. Nếu ao ô nhiễm, Cái chung bị hủy hoại kéo theo sự tan biến của mọi Cái riêng và Cái đơn nhất.";
     } else {
